@@ -3,31 +3,35 @@
 
 
 enum class KeyState { PRESSED, HELD, RELEASED };
-enum class Action { TURN_LEFT, TURN_RIGHT, MOVE_FORWARD, STOP, SHOOT, PICK_UP };
+enum class Action { TURN_LEFT, TURN_RIGHT, MOVE_FORWARD, BOOST_FORWARD, STOP, SHOOT, PICK_UP };
 
-struct KeyStateAction
+struct KeyStatePair
 {
-	KeyStateAction(olc::Key key, KeyState key_state_to_act, Action action)
+	olc::Key key;
+	KeyState state;
+};
+
+struct KeyStatesForAction
+{
+	KeyStatesForAction(std::vector<KeyStatePair> key_states_to_act, Action action)
 	{
-		this->key = key;
-		keyStateToAct = key_state_to_act;
+		keyStatesToAct = key_states_to_act;
 		this->action = action;
 	}
 
-	olc::Key key;
-	KeyState keyStateToAct;
+	std::vector<KeyStatePair> keyStatesToAct;
 	Action action;
 };
 
 struct ControlScheme
 {
 	ControlScheme() {}
-	ControlScheme(const std::vector<KeyStateAction>& key_state_actions, float turning_speed_degrees_per_second = 180)
+	ControlScheme(const std::vector<KeyStatesForAction>& key_state_actions, float turning_speed_degrees_per_second = 180)
 	{
 		keyStateActions = key_state_actions;
 		turningSpeedDegreesPerSecond = turning_speed_degrees_per_second;
 	}
 
-	std::vector<KeyStateAction> keyStateActions;
+	std::vector<KeyStatesForAction> keyStateActions;
 	float turningSpeedDegreesPerSecond = 180;
 };

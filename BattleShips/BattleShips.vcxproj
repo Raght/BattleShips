@@ -19,24 +19,31 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Bar.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="ShipPrototype.cpp" />
     <ClCompile Include="Team.cpp" />
+    <ClCompile Include="Weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Bar.h" />
     <ClInclude Include="ControlScheme.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="Globals.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Missile.h" />
     <ClInclude Include="MissilePrototype.h" />
     <ClInclude Include="olcPixelGameEngine.h" />
+    <ClInclude Include="PhysicsObject.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="GameSettings.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="ShipPrototype.h" />
     <ClInclude Include="Team.h" />
+    <ClInclude Include="Weapon.h" />
     <ClInclude Include="WeaponPrototype.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

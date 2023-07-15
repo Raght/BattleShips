@@ -8,12 +8,10 @@ Ship::Ship(ShipPrototype ship_prototype, olc::vf2d initial_position, olc::vf2d i
 	health = maxHealth;
 	maxVelocity = ship_prototype.maxVelocity;
 	maxAcceleration = ship_prototype.acceleration;
-	maxBoostAcceleration = ship_prototype.boost_acceleration;
 
 	position = initial_position;
 	direction = initial_direction;
 	velocity = initial_velocity * direction;
-	velocity_magnitude = initial_velocity;
 	acceleration = 0 * direction;
 
 
@@ -21,34 +19,6 @@ Ship::Ship(ShipPrototype ship_prototype, olc::vf2d initial_position, olc::vf2d i
 	this->team = team;
 }
 
-void Ship::TurnLeft(float degrees)
-{
-	direction = Rotate(direction, Radians(degrees));
-}
-
-void Ship::TurnRight(float degrees)
-{
-	direction = Rotate(direction, Radians(-degrees));
-}
-
-void Ship::AccelerateForward()
-{
-	acceleration = maxAcceleration * direction;
-}
-
-void Ship::StopAccelerating()
-{
-	acceleration = 0 * direction;
-}
-
-void Ship::Brake()
-{
-	olc::vf2d new_acceleration = -maxAcceleration * direction;
-	if (new_acceleration.dot(velocity) > 0.0f)
-		acceleration = 0 * direction;
-	else
-		acceleration = new_acceleration;
-}
 
 void Ship::UpdatePosition(float fElapsedTime)
 {
@@ -65,9 +35,47 @@ void Ship::UpdatePosition(float fElapsedTime)
 	position += velocity * fElapsedTime;
 }
 
+void Ship::SetAcceleration(olc::vf2d new_acceleration)
+{
+	acceleration = new_acceleration;
+}
+
+
+void Ship::TurnLeft(float degrees)
+{
+	direction = Rotate(direction, Radians(degrees));
+}
+
+void Ship::TurnRight(float degrees)
+{
+	direction = Rotate(direction, Radians(-degrees));
+}
+
+void Ship::AccelerateForward()
+{
+	olc::vf2d new_acceleration = maxAcceleration * direction;
+	if (acceleration.mag2() > new_acceleration.mag2())
+		return;
+	acceleration = new_acceleration;
+}
+
+void Ship::StopAccelerating()
+{
+	acceleration = 0 * direction;
+}
+
+void Ship::Brake()
+{
+	olc::vf2d new_acceleration = -maxAcceleration * direction;
+	if (new_acceleration.dot(velocity) > 0.0f)
+		acceleration = 0 * direction;
+	else
+		acceleration = new_acceleration;
+}
+
 void Ship::TryShoot()
 {
-
+	this->TakeDamage(10);
 }
 
 void Ship::TakeDamage(float damage)
@@ -77,6 +85,11 @@ void Ship::TakeDamage(float damage)
 	{
 		m_IsDead = true;
 	}
+}
+
+void Ship::DealDamage(float damage, Ship& ship)
+{
+	ship.TakeDamage(damage);
 }
 
 bool Ship::IsDead()

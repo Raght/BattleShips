@@ -1,7 +1,7 @@
 #pragma once
 
 
-struct MissilePrototype
+class MissilePrototype
 {
 
 };

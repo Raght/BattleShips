@@ -1,7 +1,8 @@
 #pragma once
+#include "PhysicsObject.h"
 
 
-class Missile : public GameObject
+class Missile : public PhysicsObject
 {
 public:
 	float lifetime = 0.0f;

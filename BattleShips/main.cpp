@@ -1,21 +1,21 @@
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
 #include <random>
+#include "Bar.h"
 #include "Ship.h"
 #include "Missile.h"
 #include "Player.h"
 #include "Team.h"
+#include "GameSettings.h"
+#include "Globals.h"
 
-
-int32_t SCREEN_WIDTH = 800;
-int32_t SCREEN_HEIGHT = 640;
 
 std::random_device device;
 std::default_random_engine rng(device());
 std::uniform_real_distribution<float> distribution_field_width(0, (float)SCREEN_WIDTH);
 std::uniform_real_distribution<float> distribution_field_height(0, (float)SCREEN_HEIGHT);
 std::uniform_real_distribution<float> distribution_angles(0, 2 * PI);
-std::uniform_real_distribution<float> distribution_velocities(0, 4);
+std::uniform_real_distribution<float> distribution_velocities(0, 40);
 
 
 class Game : public olc::PixelGameEngine
@@ -38,28 +38,56 @@ public:
 
 	std::vector<Ship> ships;
 	std::vector<Missile> missiles;
-
-	
-
 	std::vector<Player> players;
-
 	
-	uint32_t UI_scale = 2;
-	uint32_t UI_character_size = 8 * UI_scale;
+	int32_t UI_scale = 2;
+	int32_t UI_character_size = 8 * UI_scale;
+	olc::vi2d UI_bar_size = { 80, 6 };
 
-	std::vector<ControlScheme> control_schemes;
-	std::vector<ShipPrototype> ship_prototypes;
-	
-	bool GetKeyState(KeyStateAction& key_state_action)
+	void DrawBar(Bar& bar, const olc::Pixel& color_full, const olc::Pixel& color_empty)
 	{
-		olc::Key key = key_state_action.key;
-		KeyState key_state_to_act = key_state_action.keyStateToAct;
-		if (key_state_to_act == KeyState::PRESSED)
-			return GetKey(key).bPressed;
-		else if (key_state_to_act == KeyState::HELD)
-			return GetKey(key).bHeld;
-		else if (key_state_to_act == KeyState::RELEASED)
-			return GetKey(key).bReleased;
+		olc::vi2d position_full = bar.position - bar.size / 2;
+		double part_full = ((double)*bar.valuePtr - (double)bar.minValue) / ((double)bar.maxValue - (double)bar.minValue);
+		part_full = max(0, part_full);
+		olc::vi2d size_full = { (int32_t)round(bar.size.x * part_full), bar.size.y };
+		olc::vi2d size_empty = { bar.size.x - size_full.x, bar.size.y };
+		olc::vi2d position_empty = { position_full.x + size_full.x, position_full.y };
+		
+		FillRect(position_full, size_full, color_full);
+		FillRect(position_empty, size_empty, color_empty);
+	}
+
+	void DrawHealthBar(Bar& bar)
+	{
+		DrawBar(bar, olc::GREEN, olc::RED);
+	}
+	
+	void DrawAmmoBar(Bar& bar)
+	{
+		DrawBar(bar, olc::WHITE, olc::GREY);
+	}
+
+	
+	
+	bool AllKeyStatesPositive(KeyStatesForAction& key_state_action)
+	{
+		bool all_states_positive = true;
+		for (KeyStatePair& key_state_pair : key_state_action.keyStatesToAct)
+		{
+			olc::Key key = key_state_pair.key;
+			KeyState key_state_to_act = key_state_pair.state;
+			bool state = false;
+			if (key_state_to_act == KeyState::PRESSED)
+				state = GetKey(key).bPressed;
+			else if (key_state_to_act == KeyState::HELD)
+				state = GetKey(key).bHeld;
+			else if (key_state_to_act == KeyState::RELEASED)
+				state = GetKey(key).bReleased;
+
+			all_states_positive = all_states_positive && state;
+		}
+		
+		return all_states_positive;
 	}
 
 	void ControlShip(Player& player, float fElapsedTime)
@@ -68,12 +96,11 @@ public:
 
 		ship.StopAccelerating();
 
-		for (KeyStateAction key_state_action : player.control_scheme.keyStateActions)
+		for (KeyStatesForAction& key_state_action : player.control_scheme.keyStateActions)
 		{
 			Action action = key_state_action.action;
 			
-
-			if (GetKeyState(key_state_action))
+			if (AllKeyStatesPositive(key_state_action))
 			{
 				if (action == Action::TURN_LEFT)
 					ship.TurnLeft(player.control_scheme.turningSpeedDegreesPerSecond * fElapsedTime);
@@ -94,15 +121,10 @@ public:
 	}
 
 
+
+
 	bool OnUserCreate() override
 	{
-		ShipPrototype assault = ShipPrototype(100, 100, 100, 200);
-		ShipPrototype scout = ShipPrototype(50, 120, 200, 400);
-		ShipPrototype heavy = ShipPrototype(200, 80, 60, 120);
-
-		ship_prototypes.push_back(assault);
-		ship_prototypes.push_back(heavy);
-		ship_prototypes.push_back(scout);
 		for (int i = 0; i < ship_prototypes.size(); i++)
 		{
 			ShipPrototype& ship_prototype = ship_prototypes[i];
@@ -110,12 +132,12 @@ public:
 			Team team;
 			if (i == 0)
 			{
-				name = "Assault";
+				name = "Player 1";
 				team = TEAM_GREEN;
 			}
 			else if (i == 1)
 			{
-				name = "Heavy";
+				name = "Player 2";
 				team = TEAM_RED;
 			}
 			else
@@ -130,23 +152,10 @@ public:
 			float initial_velocity = distribution_velocities(rng);
 
 			ships.push_back(Ship(ship_prototype, initial_position, initial_direction, name, team, initial_velocity));
+			ships[i].sizeBoundingBox = { UI_character_size, UI_character_size };
 		}
-		control_schemes.push_back(ControlScheme({
-			KeyStateAction(olc::W, KeyState::HELD, Action::MOVE_FORWARD),
-			KeyStateAction(olc::S, KeyState::HELD, Action::STOP),
-			KeyStateAction(olc::A, KeyState::HELD, Action::TURN_LEFT),
-			KeyStateAction(olc::D, KeyState::HELD, Action::TURN_RIGHT),
-			KeyStateAction(olc::SPACE, KeyState::PRESSED, Action::SHOOT),
-			}));
-		control_schemes.push_back(ControlScheme({
-			KeyStateAction(olc::NP8, KeyState::HELD, Action::MOVE_FORWARD),
-			KeyStateAction(olc::NP5, KeyState::HELD, Action::STOP),
-			KeyStateAction(olc::NP4, KeyState::HELD, Action::TURN_LEFT),
-			KeyStateAction(olc::NP6, KeyState::HELD, Action::TURN_RIGHT),
-			KeyStateAction(olc::RETURN, KeyState::PRESSED, Action::SHOOT),
-			}));
-		players.push_back(Player(control_schemes[0], &ships[0]));
-		players.push_back(Player(control_schemes[1], &ships[1]));
+		players.push_back(Player(control_scheme_player_first, &ships[0]));
+		players.push_back(Player(control_scheme_player_second, &ships[1]));
 
 
 		return true;
@@ -170,20 +179,33 @@ public:
 			ControlShip(player, fElapsedTime);
 		}
 
-		// Draw UI
+		
 		for (Ship& ship : ships)
 		{
 			ship.UpdatePosition(fElapsedTime);
 			ship.position.x = mod(ship.position.x, SCREEN_WIDTH);
 			ship.position.y = mod(ship.position.y, SCREEN_HEIGHT);
 
+			
+		}
+
+
+
+		for (Ship& ship : ships)
+		{
 			FillCircle(ToScreenSpace(ship.position), 6, ship.team.color);
 			FillCircle(ToScreenSpace(ship.position), 3, olc::BLACK);
 			DrawLine(ToScreenSpace(ship.position), ToScreenSpace(ship.position + 100.0f * ship.direction), ship.team.color);
 			DrawLine(ToScreenSpace(ship.position), ToScreenSpace(ship.position + ship.velocity), olc::MAGENTA);
-			DrawStringCenter(ToScreenSpace(ship.position) - olc::vi2d(0, UI_character_size), ship.name, ship.team.color, UI_scale);
-		}
 
+			float max_size = max(ship.sizeBoundingBox.x, ship.sizeBoundingBox.y);
+
+			DrawStringCenter(ToScreenSpace(ship.position - olc::vf2d(0, max_size) - olc::vf2d(0, UI_character_size / 2)), ship.name, ship.team.color, UI_scale);
+
+			olc::vi2d health_bar_position = ToScreenSpace(ship.position + olc::vf2d(0, max_size) + olc::vf2d(0, UI_bar_size.y));
+			Bar health_bar = Bar(health_bar_position, UI_bar_size, &ship.health, ship.maxHealth);
+			DrawHealthBar(health_bar);
+		}
 
 
 		return true;
