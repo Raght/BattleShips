@@ -903,6 +903,10 @@ namespace olc
 	};
 }
 
+#if !defined(OLC_IGNORE_VEC2D)
+typedef olc::vf2d Vector2;
+#endif
+
 #endif // OLC_PGE_DEF
 
 

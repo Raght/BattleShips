@@ -10,8 +10,7 @@
 #include "Globals.h"
 
 
-std::random_device device;
-std::default_random_engine rng(device());
+
 std::uniform_real_distribution<float> distribution_field_width(0, (float)SCREEN_WIDTH);
 std::uniform_real_distribution<float> distribution_field_height(0, (float)SCREEN_HEIGHT);
 std::uniform_real_distribution<float> distribution_angles(0, 2 * PI);
@@ -122,7 +121,7 @@ public:
 
 
 
-
+	
 	bool OnUserCreate() override
 	{
 		for (int i = 0; i < ship_prototypes.size(); i++)

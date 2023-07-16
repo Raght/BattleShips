@@ -22,6 +22,10 @@ int Cap(int number, int minimum, int maximum);
 
 float Radians(float eulerAngle);
 
-float AngleBetween(const olc::vf2d& v1, const olc::vf2d& v2);
+float Degrees(float radians);
 
-olc::vf2d Rotate(const olc::vf2d& v, float radians);
+float AngleBetween(olc::vf2d v1, olc::vf2d v2);
+
+olc::vf2d RotateVector(olc::vf2d v, float radians);
+
+olc::vf2d RotateVectorAroundPoint(olc::vf2d v, olc::vf2d point, float radians);

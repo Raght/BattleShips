@@ -2,7 +2,15 @@
 #include "PhysicsObject.h"
 
 
-class Missile : public PhysicsObject
+
+class MissilePrototype
+{
+
+};
+
+
+
+class Missile : public PhysicsObject, public MissilePrototype
 {
 public:
 	float lifetime = 0.0f;

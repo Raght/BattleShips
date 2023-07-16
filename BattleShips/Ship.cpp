@@ -1,6 +1,15 @@
 #include "Ship.h"
 
 
+
+ShipPrototype::ShipPrototype(float max_health, float max_velocity, float max_acceleration)
+	: health(max_health), maxVelocity(max_velocity), acceleration(max_acceleration)
+{
+
+}
+
+
+
 Ship::Ship(ShipPrototype ship_prototype, olc::vf2d initial_position, olc::vf2d initial_direction,
 	const std::string& name, Team team, float initial_velocity)
 {
@@ -20,6 +29,15 @@ Ship::Ship(ShipPrototype ship_prototype, olc::vf2d initial_position, olc::vf2d i
 }
 
 
+void Ship::Rotate(olc::vf2d point, float degrees)
+{
+	float radians = Radians(degrees);
+
+	weapon.mesh.Rotate(position, degrees);
+	hull.mesh.Rotate();
+	direction = RotateVector(direction, radians);
+}
+
 void Ship::UpdatePosition(float fElapsedTime)
 {
 	olc::vf2d new_velocity = velocity + acceleration * fElapsedTime;
@@ -35,20 +53,17 @@ void Ship::UpdatePosition(float fElapsedTime)
 	position += velocity * fElapsedTime;
 }
 
-void Ship::SetAcceleration(olc::vf2d new_acceleration)
-{
-	acceleration = new_acceleration;
-}
+
 
 
 void Ship::TurnLeft(float degrees)
 {
-	direction = Rotate(direction, Radians(degrees));
+	Rotate(position, degrees);
 }
 
 void Ship::TurnRight(float degrees)
 {
-	direction = Rotate(direction, Radians(-degrees));
+	Rotate(position, -degrees);
 }
 
 void Ship::AccelerateForward()

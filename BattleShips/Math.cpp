@@ -44,12 +44,17 @@ float Radians(float eulerAngle)
 	return eulerAngle * PI / 180.0f;
 }
 
-float AngleBetween(const olc::vf2d& v1, const olc::vf2d& v2)
+float Degrees(float radians)
+{
+	return radians / PI * 180.0f;
+}
+
+float AngleBetween(olc::vf2d v1, olc::vf2d v2)
 {
 	return acosf((v1.dot(v2)) / (v1.mag() * v2.mag()));
 }
 
-olc::vf2d Rotate(const olc::vf2d& v, float radians)
+olc::vf2d RotateVector(olc::vf2d v, float radians)
 {
 	//return { v.x * cos(radians) - v.y * sin(radians),
 	//		 v.x * sin(radians) + v.y * cos(radians) };
@@ -58,4 +63,13 @@ olc::vf2d Rotate(const olc::vf2d& v, float radians)
 	std::complex<float> r = { cosf(radians), sinf(radians) };
 	std::complex<float> new_d = d * r;
 	return { new_d.real(), new_d.imag() };
+}
+
+olc::vf2d RotateVectorAroundPoint(olc::vf2d v, olc::vf2d point, float radians)
+{
+	v -= point;
+	v = RotateVector(v, radians);
+	v += point;
+
+	return v;
 }
