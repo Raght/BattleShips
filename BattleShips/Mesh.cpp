@@ -64,7 +64,7 @@ PositionedVector::PositionedVector(olc::vf2d position, olc::vf2d direction)
 
 
 
-ShipMesh::ShipMesh(const std::vector<olc::vf2d>& mesh_points,
+HullMesh::HullMesh(const std::vector<olc::vf2d>& mesh_points,
 	const PositionedVector& ship_origin,
 	const PositionedVector& weapon_to_ship_origin,
 	const olc::Pixel& mesh_color)
@@ -73,21 +73,21 @@ ShipMesh::ShipMesh(const std::vector<olc::vf2d>& mesh_points,
 
 }
 
-void ShipMesh::Translate(olc::vf2d move)
+void HullMesh::Translate(olc::vf2d move)
 {
 	Mesh::Translate(move);
 	ship_origin.position += move;
 	weapon_to_ship_origin.position += move;
 }
 
-Mesh ShipMesh::ReturnTranslatedMesh(olc::vf2d move)
+Mesh HullMesh::ReturnTranslatedMesh(olc::vf2d move)
 {
-	ShipMesh translated_mesh = *this;
+	HullMesh translated_mesh = *this;
 	translated_mesh.Translate(move);
 	return translated_mesh;
 }
 
-void ShipMesh::Rotate(olc::vf2d rotation_origin, float degrees)
+void HullMesh::Rotate(olc::vf2d rotation_origin, float degrees)
 {
 	Mesh::Rotate(rotation_origin, degrees);
 	ship_origin.position = RotateVectorAroundPoint(ship_origin.position, rotation_origin, Radians(degrees));
@@ -96,9 +96,9 @@ void ShipMesh::Rotate(olc::vf2d rotation_origin, float degrees)
 	weapon_to_ship_origin.direction = RotateVector(weapon_to_ship_origin.direction, Radians(degrees));
 }
 
-Mesh ShipMesh::ReturnRotatedMesh(olc::vf2d rotation_origin, float degrees)
+Mesh HullMesh::ReturnRotatedMesh(olc::vf2d rotation_origin, float degrees)
 {
-	ShipMesh rotated_mesh = *this;
+	HullMesh rotated_mesh = *this;
 	rotated_mesh.Rotate(rotation_origin, degrees);
 	return rotated_mesh;
 }

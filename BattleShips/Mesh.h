@@ -31,9 +31,9 @@ struct PositionedVector
 };
 
 
-class ShipMesh : public Mesh
+class HullMesh : public Mesh
 {
-	ShipMesh(const std::vector<olc::vf2d>& mesh_points,
+	HullMesh(const std::vector<olc::vf2d>& mesh_points,
 		const PositionedVector& ship_origin,
 		const PositionedVector& weapon_to_ship_origin,
 		const olc::Pixel& mesh_color);
