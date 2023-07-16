@@ -22,6 +22,7 @@
     <ClCompile Include="Bar.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Math.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="ShipPrototype.cpp" />
     <ClCompile Include="Team.cpp" />

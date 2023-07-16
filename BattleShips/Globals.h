@@ -3,6 +3,7 @@
 #include "ShipPrototype.h"
 #include "MissilePrototype.h"
 #include "WeaponPrototype.h"
+#include "Mesh.h"
 
 
 inline ControlScheme control_scheme_player_first = ControlScheme({
@@ -30,3 +31,11 @@ ShipPrototype heavy = ShipPrototype(200, 80, 60);
 
 std::vector<ShipPrototype> ship_prototypes = { assault, scout, heavy };
 
+Mesh quad;
+quad.points = { {0.0, 0.0}, {0.0, 1.0}, {1.0, 1.0}, {1.0, 0.0} };
+quad.color = { 0, 255, 0 };
+WeaponMesh weapon_mesh;
+weapon_mesh.points = { {-0.5, 0.0}, {0.5, 0.0}, {0.5, 2.0}, {-0.5, 2.0} };
+weapon_mesh.color = { 0, 255, 0 };
+weapon_mesh.missile_origins = { {{0.0, 2.0}, {0.0, 1.0}} };
+weapon_mesh.weapon_to_ship_origin = { {0.0, EPSILON}, {0.0, 1.0} };
