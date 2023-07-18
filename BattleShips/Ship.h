@@ -13,10 +13,11 @@ class ShipPrototype
 {
 public:
 	ShipPrototype(float max_health, float max_velocity, float max_acceleration);
+	ShipPrototype(const ShipPrototype& ship_prototype);
 
-	float health;
+	float maxHealth;
 	float maxVelocity;
-	float acceleration;
+	float maxAcceleration;
 };
 
 
@@ -24,7 +25,8 @@ public:
 class Ship : public PhysicsObject
 {
 public:
-	Ship(ShipPrototype ship_prototype, olc::vf2d initial_position, olc::vf2d initial_direction,
+	Ship(HullPrototype hull_prototype, WeaponPrototype weapon_prototype,
+		olc::vf2d initial_position, olc::vf2d initial_direction,
 		const std::string& name, Team team, float initial_velocity = 0);
 
 	void Rotate(olc::vf2d point, float degrees);

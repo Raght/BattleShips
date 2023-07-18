@@ -5,7 +5,7 @@
 
 class HullPrototype
 {
-	float health;
+public:
 	float maxHealth;
 	float maxVelocity;
 	float maxAcceleration;
@@ -15,5 +15,8 @@ class HullPrototype
 
 class Hull : public PhysicsObject, public HullPrototype
 {
+public:
+	Hull(const HullPrototype& hull_prototype, olc::vf2d position, olc::vf2d direction);
 
+	float health;
 };

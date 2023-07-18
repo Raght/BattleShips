@@ -4,6 +4,24 @@
 #include <vector>
 
 
+struct Polygon
+{
+	Polygon();
+	Polygon(const std::vector<olc::vf2d>& points);
+
+	std::vector<olc::vf2d> points;
+};
+
+struct PositionedVector
+{
+	PositionedVector();
+	PositionedVector(olc::vf2d position, olc::vf2d direction);
+
+	olc::vf2d position;
+	olc::vf2d direction;
+};
+
+
 class Mesh
 {
 public:
@@ -21,18 +39,9 @@ public:
 };
 
 
-struct PositionedVector
-{
-	PositionedVector();
-	PositionedVector(olc::vf2d position, olc::vf2d direction);
-
-	olc::vf2d position;
-	olc::vf2d direction;
-};
-
-
 class HullMesh : public Mesh
 {
+public:
 	HullMesh(const std::vector<olc::vf2d>& mesh_points,
 		const PositionedVector& ship_origin,
 		const PositionedVector& weapon_to_ship_origin,

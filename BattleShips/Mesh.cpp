@@ -1,6 +1,31 @@
 #include "Mesh.h"
 
 
+
+Polygon::Polygon()
+{
+
+}
+
+Polygon::Polygon(const std::vector<olc::vf2d>& points)
+	: points(points)
+{
+
+}
+
+PositionedVector::PositionedVector()
+	: position(0.0, 0.0), direction(1.0, 0.0)
+{
+
+}
+
+PositionedVector::PositionedVector(olc::vf2d position, olc::vf2d direction)
+	: position(position), direction(direction)
+{
+
+}
+
+
 Mesh::Mesh(const std::vector<olc::vf2d>& mesh_points, const olc::Pixel& mesh_color)
 	: points(mesh_points), color(mesh_color)
 {
@@ -48,20 +73,6 @@ Mesh Mesh::ReturnRotatedMesh(olc::vf2d rotation_origin, float degrees)
 	rotated_mesh.Rotate(rotation_origin, degrees);
 	return rotated_mesh;
 }
-
-
-PositionedVector::PositionedVector()
-	: position(0.0, 0.0), direction(1.0, 0.0)
-{
-
-}
-
-PositionedVector::PositionedVector(olc::vf2d position, olc::vf2d direction)
-	: position(position), direction(direction)
-{
-
-}
-
 
 
 HullMesh::HullMesh(const std::vector<olc::vf2d>& mesh_points,

@@ -3,20 +3,24 @@
 
 
 ShipPrototype::ShipPrototype(float max_health, float max_velocity, float max_acceleration)
-	: health(max_health), maxVelocity(max_velocity), acceleration(max_acceleration)
+	: maxHealth(max_health), maxVelocity(max_velocity), maxAcceleration(max_acceleration)
 {
 
 }
 
+ShipPrototype::ShipPrototype(const ShipPrototype& ship_prototype)
+{
+	*this = ship_prototype;
+}
 
 
-Ship::Ship(ShipPrototype ship_prototype, olc::vf2d initial_position, olc::vf2d initial_direction,
+
+Ship::Ship(HullPrototype hull_prototype, WeaponPrototype weapon_prototype,
+	olc::vf2d initial_position, olc::vf2d initial_direction,
 	const std::string& name, Team team, float initial_velocity)
 {
-	maxHealth = ship_prototype.health;
-	health = maxHealth;
-	maxVelocity = ship_prototype.maxVelocity;
-	maxAcceleration = ship_prototype.acceleration;
+	hull = Hull(hull_prototype);
+	weapon = Weapon(weapon_prototype);
 
 	position = initial_position;
 	direction = initial_direction;

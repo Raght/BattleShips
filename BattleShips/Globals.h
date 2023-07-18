@@ -1,4 +1,5 @@
 #pragma once
+#include "olcPixelGameEngine.h"
 #include <random>
 #include "ControlScheme.h"
 #include "Ship.h"
@@ -41,9 +42,17 @@ Mesh quad(
 	{ {0.0, 0.0}, {0.0, 1.0}, {1.0, 1.0}, {1.0, 0.0} },
 	{ 0, 255, 0 }
 );
+
 WeaponMesh weapon_assault_cannon_mesh(
-	{ {-16.5, 0.0}, {16.5, 0.0}, {16.5, 33}, {-16.5, 33} },
+	{ {-16.5, 0.0}, {16.5, 0.0}, {16.5, 66}, {-16.5, 66} },
 	{ {{0.0, 2.0}, {0.0, 1.0}} },
 	{ {0.0, EPSILON}, {0.0, 1.0} },
-	{ 0, 255, 0 }
+	olc::GREEN
+);
+
+HullMesh hull_assault_mesh(
+	{ {-50, 0}, {50, 0}, {50, 33}, {-50, 33} },
+	{ { 0, 16.5 }, {0, 1} },
+	{ { 0, 33 }, {0, 1} },
+	olc::GREEN
 );
