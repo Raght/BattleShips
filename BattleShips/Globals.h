@@ -31,16 +31,17 @@ inline ControlScheme control_scheme_player_second = ControlScheme({
 });
 
 
-ShipPrototype assault = ShipPrototype(100, 100, 100);
-ShipPrototype scout = ShipPrototype(50, 120, 200);
-ShipPrototype heavy = ShipPrototype(200, 80, 60);
-
-std::vector<ShipPrototype> ship_prototypes = { assault, scout, heavy };
-
-
 Mesh quad(
 	{ {0.0, 0.0}, {0.0, 1.0}, {1.0, 1.0}, {1.0, 0.0} },
 	{ 0, 255, 0 }
+);
+
+
+HullMesh hull_assault_mesh(
+	{ {-50, 0}, {50, 0}, {50, 33}, {-50, 33} },
+	{ { 0, 16.5 }, {0, 1} },
+	{ { 0, 33 }, {0, 1} },
+	olc::GREEN
 );
 
 WeaponMesh weapon_assault_cannon_mesh(
@@ -50,9 +51,13 @@ WeaponMesh weapon_assault_cannon_mesh(
 	olc::GREEN
 );
 
-HullMesh hull_assault_mesh(
-	{ {-50, 0}, {50, 0}, {50, 33}, {-50, 33} },
-	{ { 0, 16.5 }, {0, 1} },
-	{ { 0, 33 }, {0, 1} },
-	olc::GREEN
-);
+
+
+HullPrototype assault = HullPrototype(100, 100, 100, hull_assault_mesh);
+HullPrototype scout = HullPrototype(50, 120, 200, hull_assault_mesh);
+HullPrototype heavy = HullPrototype(200, 80, 60, hull_assault_mesh);
+
+std::vector<HullPrototype> hull_prototypes = { assault, scout, heavy };
+
+
+

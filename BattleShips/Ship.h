@@ -9,26 +9,14 @@
 
 
 
-class ShipPrototype
-{
-public:
-	ShipPrototype(float max_health, float max_velocity, float max_acceleration);
-	ShipPrototype(const ShipPrototype& ship_prototype);
-
-	float maxHealth;
-	float maxVelocity;
-	float maxAcceleration;
-};
-
-
-
 class Ship : public PhysicsObject
 {
 public:
-	Ship(HullPrototype hull_prototype, WeaponPrototype weapon_prototype,
+	Ship(const HullPrototype& hull_prototype, const WeaponPrototype& weapon_prototype,
 		olc::vf2d initial_position, olc::vf2d initial_direction,
 		const std::string& name, Team team, float initial_velocity = 0);
 
+	void SetAcceleration(olc::vf2d new_acceleration);
 	void Rotate(olc::vf2d point, float degrees);
 	void UpdatePosition(float fElapsedTime);
 
@@ -43,6 +31,11 @@ public:
 	void TakeDamage(float damage);
 	void DealDamage(float damage, Ship& ship);
 	bool IsDead();
+
+
+	float maxHealth;
+	float maxVelocity;
+	float maxAcceleration;
 
 	Hull hull;
 	Weapon weapon;

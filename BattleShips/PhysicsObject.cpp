@@ -2,6 +2,11 @@
 
 
 
+PhysicsObject::PhysicsObject()
+{
+
+}
+
 void PhysicsObject::SetAcceleration(olc::vf2d new_acceleration)
 {
 	acceleration = new_acceleration;

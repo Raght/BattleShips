@@ -26,6 +26,11 @@ PositionedVector::PositionedVector(olc::vf2d position, olc::vf2d direction)
 }
 
 
+Mesh::Mesh()
+{
+
+}
+
 Mesh::Mesh(const std::vector<olc::vf2d>& mesh_points, const olc::Pixel& mesh_color)
 	: points(mesh_points), color(mesh_color)
 {
@@ -75,6 +80,11 @@ Mesh Mesh::ReturnRotatedMesh(olc::vf2d rotation_origin, float degrees)
 }
 
 
+HullMesh::HullMesh()
+{
+
+}
+
 HullMesh::HullMesh(const std::vector<olc::vf2d>& mesh_points,
 	const PositionedVector& ship_origin,
 	const PositionedVector& weapon_to_ship_origin,
@@ -115,6 +125,11 @@ Mesh HullMesh::ReturnRotatedMesh(olc::vf2d rotation_origin, float degrees)
 }
 
 
+
+WeaponMesh::WeaponMesh()
+{
+
+}
 
 WeaponMesh::WeaponMesh(const std::vector<olc::vf2d>& mesh_points,
 	const std::vector<PositionedVector>& missile_origins,

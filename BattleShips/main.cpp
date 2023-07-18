@@ -46,7 +46,7 @@ public:
 	void DrawBar(Bar& bar, const olc::Pixel& color_full, const olc::Pixel& color_empty)
 	{
 		olc::vi2d position_full = bar.position - bar.size / 2;
-		double part_full = ((double)*bar.valuePtr - (double)bar.minValue) / ((double)bar.maxValue - (double)bar.minValue);
+		double part_full = ((double)*bar.value - (double)bar.minValue) / ((double)bar.maxValue - (double)bar.minValue);
 		part_full = max(0, part_full);
 		olc::vi2d size_full = { (int32_t)round(bar.size.x * part_full), bar.size.y };
 		olc::vi2d size_empty = { bar.size.x - size_full.x, bar.size.y };
@@ -124,9 +124,9 @@ public:
 	
 	bool OnUserCreate() override
 	{
-		for (int i = 0; i < ship_prototypes.size(); i++)
+		for (int i = 0; i < hull_prototypes.size(); i++)
 		{
-			ShipPrototype& ship_prototype = ship_prototypes[i];
+			ShipPrototype& ship_prototype = hull_prototypes[i];
 			std::string name;
 			Team team;
 			if (i == 0)
@@ -202,8 +202,12 @@ public:
 			DrawStringCenter(ToScreenSpace(ship.position - olc::vf2d(0, max_size) - olc::vf2d(0, UI_character_size / 2)), ship.name, ship.team.color, UI_scale);
 
 			olc::vi2d health_bar_position = ToScreenSpace(ship.position + olc::vf2d(0, max_size) + olc::vf2d(0, UI_bar_size.y));
-			Bar health_bar = Bar(health_bar_position, UI_bar_size, &ship.health, ship.maxHealth);
+			Bar health_bar = Bar(health_bar_position, UI_bar_size, ship.hull.health, ship.hull.maxHealth);
 			DrawHealthBar(health_bar);
+
+			olc::vi2d ammo_bar_position = ToScreenSpace(ship.position + olc::vf2d(0, max_size) + olc::vf2d(0, UI_bar_size.y));
+			Bar ammo_bar = Bar(ammo_bar_position, UI_bar_size, ship.weapon.ammo, ship.weapon.ammo);
+			DrawAmmoBar(health_bar);
 		}
 
 

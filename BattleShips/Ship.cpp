@@ -2,30 +2,18 @@
 
 
 
-ShipPrototype::ShipPrototype(float max_health, float max_velocity, float max_acceleration)
-	: maxHealth(max_health), maxVelocity(max_velocity), maxAcceleration(max_acceleration)
-{
-
-}
-
-ShipPrototype::ShipPrototype(const ShipPrototype& ship_prototype)
-{
-	*this = ship_prototype;
-}
-
-
-
-Ship::Ship(HullPrototype hull_prototype, WeaponPrototype weapon_prototype,
+Ship::Ship(const HullPrototype& hull_prototype, const WeaponPrototype& weapon_prototype,
 	olc::vf2d initial_position, olc::vf2d initial_direction,
 	const std::string& name, Team team, float initial_velocity)
 {
-	hull = Hull(hull_prototype);
-	weapon = Weapon(weapon_prototype);
-
 	position = initial_position;
 	direction = initial_direction;
 	velocity = initial_velocity * direction;
 	acceleration = 0 * direction;
+
+	hull = Hull(hull_prototype, position, direction);
+	weapon = Weapon(weapon_prototype, position, direction);
+
 
 
 	this->name = name;
@@ -33,13 +21,21 @@ Ship::Ship(HullPrototype hull_prototype, WeaponPrototype weapon_prototype,
 }
 
 
+void Ship::SetAcceleration(olc::vf2d new_acceleration)
+{
+	acceleration = new_acceleration;
+	hull.acceleration = new_acceleration;
+	weapon.acceleration = new_acceleration;
+}
+
+
 void Ship::Rotate(olc::vf2d point, float degrees)
 {
 	float radians = Radians(degrees);
 
-	weapon.mesh.Rotate(position, degrees);
-	hull.mesh.Rotate();
 	direction = RotateVector(direction, radians);
+	hull.mesh.Rotate(position, radians);
+	weapon.mesh.Rotate(position, radians);
 }
 
 void Ship::UpdatePosition(float fElapsedTime)
@@ -50,8 +46,8 @@ void Ship::UpdatePosition(float fElapsedTime)
 	//	new_velocity = velocity;
 	//}
 
-	if (new_velocity.mag2() > maxVelocity * maxVelocity)
-		new_velocity = new_velocity / new_velocity.mag() * maxVelocity;
+	if (new_velocity.mag2() > hull.maxVelocity * hull.maxVelocity)
+		new_velocity = new_velocity / new_velocity.mag() * hull.maxVelocity;
 
 	velocity = new_velocity;
 	position += velocity * fElapsedTime;
@@ -75,21 +71,21 @@ void Ship::AccelerateForward()
 	olc::vf2d new_acceleration = maxAcceleration * direction;
 	if (acceleration.mag2() > new_acceleration.mag2())
 		return;
-	acceleration = new_acceleration;
+	SetAcceleration(new_acceleration);
 }
 
 void Ship::StopAccelerating()
 {
-	acceleration = 0 * direction;
+	SetAcceleration(0 * direction);
 }
 
 void Ship::Brake()
 {
 	olc::vf2d new_acceleration = -maxAcceleration * direction;
 	if (new_acceleration.dot(velocity) > 0.0f)
-		acceleration = 0 * direction;
+		StopAccelerating();
 	else
-		acceleration = new_acceleration;
+		SetAcceleration(new_acceleration);
 }
 
 void Ship::TryShoot()
@@ -99,8 +95,8 @@ void Ship::TryShoot()
 
 void Ship::TakeDamage(float damage)
 {
-	health -= damage;
-	if (Equal(health, 0) || health < 0)
+	hull.health -= damage;
+	if (Equal(hull.health, 0) || hull.health < 0)
 	{
 		m_IsDead = true;
 	}

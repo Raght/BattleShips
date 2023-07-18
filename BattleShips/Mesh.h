@@ -25,6 +25,7 @@ struct PositionedVector
 class Mesh
 {
 public:
+	Mesh();
 	Mesh(const std::vector<olc::vf2d>& mesh_points, const olc::Pixel& mesh_color = olc::WHITE);
 
 	void PrintData();
@@ -42,6 +43,7 @@ public:
 class HullMesh : public Mesh
 {
 public:
+	HullMesh();
 	HullMesh(const std::vector<olc::vf2d>& mesh_points,
 		const PositionedVector& ship_origin,
 		const PositionedVector& weapon_to_ship_origin,
@@ -60,6 +62,7 @@ public:
 class WeaponMesh : public Mesh
 {
 public:
+	WeaponMesh();
 	WeaponMesh(const std::vector<olc::vf2d>& mesh_points,
 		const std::vector<PositionedVector>& missile_origins,
 		const PositionedVector& weapon_to_ship_origin,

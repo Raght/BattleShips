@@ -5,6 +5,8 @@
 class PhysicsObject : public GameObject
 {
 public:
+	PhysicsObject();
+
 	olc::vf2d velocity;
 	olc::vf2d acceleration;
 
