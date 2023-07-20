@@ -2,8 +2,7 @@
 #include "Missile.h"
 #include "PhysicsObject.h"
 #include "Mesh.h"
-#include "Globals.h"
-#include <random>
+#include "GlobalsMechanics.h"
 #include <unordered_set>
 
 
@@ -21,12 +20,13 @@ public:
 };
 
 
-class Weapon : public PhysicsObject, public WeaponPrototype
+class Weapon : public GameObject, public WeaponPrototype
 {
 public:
 	Weapon();
 	Weapon(const WeaponPrototype& weapon_prototype, olc::vf2d position, olc::vf2d direction);
 
+	void Move(olc::vf2d move);
 
 	int32_t ammo;
 

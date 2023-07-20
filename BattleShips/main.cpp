@@ -7,7 +7,8 @@
 #include "Player.h"
 #include "Team.h"
 #include "GameSettings.h"
-#include "Globals.h"
+#include "GlobalsMechanics.h"
+#include "GlobalsData.h"
 
 
 
@@ -46,7 +47,7 @@ public:
 	void DrawBar(Bar& bar, const olc::Pixel& color_full, const olc::Pixel& color_empty)
 	{
 		olc::vi2d position_full = bar.position - bar.size / 2;
-		double part_full = ((double)*bar.value - (double)bar.minValue) / ((double)bar.maxValue - (double)bar.minValue);
+		double part_full = ((double)bar.value - (double)bar.minValue) / ((double)bar.maxValue - (double)bar.minValue);
 		part_full = max(0, part_full);
 		olc::vi2d size_full = { (int32_t)round(bar.size.x * part_full), bar.size.y };
 		olc::vi2d size_empty = { bar.size.x - size_full.x, bar.size.y };
@@ -89,6 +90,12 @@ public:
 		return all_states_positive;
 	}
 
+	void AddMissiles(std::vector<Missile>& missiles_to_add)
+	{
+		for (Missile& missile : missiles_to_add)
+			missiles.push_back(missile);
+	}
+
 	void ControlShip(Player& player, float fElapsedTime)
 	{
 		Ship& ship = *player.controlled_ship;
@@ -101,6 +108,8 @@ public:
 			
 			if (AllKeyStatesPositive(key_state_action))
 			{
+				std::vector<Missile> missiles_to_add;
+
 				if (action == Action::TURN_LEFT)
 					ship.TurnLeft(player.control_scheme.turningSpeedDegreesPerSecond * fElapsedTime);
 				else if (action == Action::TURN_RIGHT)
@@ -110,7 +119,9 @@ public:
 				else if (action == Action::STOP)
 					ship.Brake();
 				else if (action == Action::SHOOT)
-					ship.TryShoot();
+					ship.TryShoot(missiles_to_add);
+
+				AddMissiles(missiles_to_add);
 			}
 			else
 			{
@@ -119,6 +130,28 @@ public:
 		}
 	}
 
+	void DrawPolygon(const std::vector<olc::vf2d>& points, olc::Pixel color)
+	{
+		if (points.size() <= 2)
+			return;
+
+		for (int i = 0; i < points.size() - 1; i++)
+		{
+			DrawLine(ToScreenSpace(points[i]), ToScreenSpace(points[i + 1]), color);
+		}
+		DrawLine(ToScreenSpace(points[points.size() - 1]), ToScreenSpace(points[0]), color);
+	}
+
+	void DrawShip(const Ship& ship)
+	{
+		DrawPolygon(ship.hull.mesh.points, ship.hull.mesh.color);
+		DrawPolygon(ship.weapon.mesh.points, ship.weapon.mesh.color);
+	}
+
+	void DrawMissile(const Missile& missile)
+	{
+		DrawPolygon(missile.mesh.points, missile.mesh.color);
+	}
 
 
 	
@@ -126,7 +159,8 @@ public:
 	{
 		for (int i = 0; i < hull_prototypes.size(); i++)
 		{
-			ShipPrototype& ship_prototype = hull_prototypes[i];
+			HullPrototype& hull_prototype = hull_prototypes[i];
+			WeaponPrototype& weapon_prototype = assault_cannon;
 			std::string name;
 			Team team;
 			if (i == 0)
@@ -150,7 +184,7 @@ public:
 			olc::vf2d initial_direction = { cosf(angle), sinf(angle) };
 			float initial_velocity = distribution_velocities(rng);
 
-			ships.push_back(Ship(ship_prototype, initial_position, initial_direction, name, team, initial_velocity));
+			ships.push_back(Ship(hull_prototype, weapon_prototype, initial_position, initial_direction, name, team, initial_velocity));
 			ships[i].sizeBoundingBox = { UI_character_size, UI_character_size };
 		}
 		players.push_back(Player(control_scheme_player_first, &ships[0]));
@@ -182,13 +216,22 @@ public:
 		for (Ship& ship : ships)
 		{
 			ship.UpdatePosition(fElapsedTime);
-			ship.position.x = mod(ship.position.x, SCREEN_WIDTH);
-			ship.position.y = mod(ship.position.y, SCREEN_HEIGHT);
+			olc::vf2d position_mod = { mod(ship.position.x, SCREEN_WIDTH), mod(ship.position.y, SCREEN_HEIGHT) };
+			ship.SetPosition(position_mod);
 
-			
+			//DrawCircle(ToScreenSpace(ship.weapon.mesh.missile_origins[0].position), 10);
+		}
+
+		for (Missile& missile : missiles)
+		{
+			missile.UpdatePosition(fElapsedTime);
 		}
 
 
+		for (Ship& ship : ships)
+		{
+			DrawShip(ship);
+		}
 
 		for (Ship& ship : ships)
 		{
@@ -205,9 +248,14 @@ public:
 			Bar health_bar = Bar(health_bar_position, UI_bar_size, ship.hull.health, ship.hull.maxHealth);
 			DrawHealthBar(health_bar);
 
-			olc::vi2d ammo_bar_position = ToScreenSpace(ship.position + olc::vf2d(0, max_size) + olc::vf2d(0, UI_bar_size.y));
-			Bar ammo_bar = Bar(ammo_bar_position, UI_bar_size, ship.weapon.ammo, ship.weapon.ammo);
-			DrawAmmoBar(health_bar);
+			olc::vi2d ammo_bar_position = ToScreenSpace(ship.position + olc::vf2d(0, max_size) + 3 * olc::vf2d(0, UI_bar_size.y));
+			Bar ammo_bar = Bar(ammo_bar_position, UI_bar_size, ship.weapon.ammo, ship.weapon.maxAmmo);
+			DrawAmmoBar(ammo_bar);
+		}
+
+		for (Missile& missile : missiles)
+		{
+			DrawMissile(missile);
 		}
 
 

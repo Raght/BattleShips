@@ -6,6 +6,7 @@ class GameObject
 {
 public:
 	GameObject();
+	GameObject(olc::vf2d position);
 
 	void Move(olc::vf2d move);
 

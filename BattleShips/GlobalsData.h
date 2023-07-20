@@ -8,9 +8,6 @@
 #include "Mesh.h"
 
 
-inline std::random_device device;
-inline std::default_random_engine rng(device());
-
 
 inline ControlScheme control_scheme_player_first = ControlScheme({
 	KeyStatesForAction({{olc::W, KeyState::HELD}}, Action::MOVE_FORWARD),
@@ -31,33 +28,44 @@ inline ControlScheme control_scheme_player_second = ControlScheme({
 });
 
 
-Mesh quad(
+inline Mesh quad(
 	{ {0.0, 0.0}, {0.0, 1.0}, {1.0, 1.0}, {1.0, 0.0} },
 	{ 0, 255, 0 }
 );
 
 
-HullMesh hull_assault_mesh(
-	{ {-50, 0}, {50, 0}, {50, 33}, {-50, 33} },
-	{ { 0, 16.5 }, {0, 1} },
-	{ { 0, 33 }, {0, 1} },
-	olc::GREEN
-);
+inline float _scale_factor = 20.0f / 27 * 4 / 3;
 
-WeaponMesh weapon_assault_cannon_mesh(
-	{ {-16.5, 0.0}, {16.5, 0.0}, {16.5, 66}, {-16.5, 66} },
-	{ {{0.0, 2.0}, {0.0, 1.0}} },
+inline HullMesh hull_assault_mesh = HullMesh(
+	{ {-45, 0}, {45, 0}, {45, 30}, {-45, 30} },
+	{ { 0, 15 }, {0, 1} },
+	{ { 0, 0 }, {0, 1} },
+	olc::GREEN
+).GetScaledMesh(_scale_factor);
+
+inline WeaponMesh weapon_assault_cannon_mesh = WeaponMesh(
+	{ {-15, 0.0}, {15, 0.0}, {15, 60}, {-15, 60} },
+	{ {{0.0, 60}, {0.0, 1.0}} },
 	{ {0.0, EPSILON}, {0.0, 1.0} },
 	olc::GREEN
-);
+).GetScaledMesh(_scale_factor);
 
 
 
-HullPrototype assault = HullPrototype(100, 100, 100, hull_assault_mesh);
-HullPrototype scout = HullPrototype(50, 120, 200, hull_assault_mesh);
-HullPrototype heavy = HullPrototype(200, 80, 60, hull_assault_mesh);
+inline HullPrototype assault(100, 100, 100, hull_assault_mesh);
+inline HullPrototype scout(50, 120, 200, hull_assault_mesh);
+inline HullPrototype heavy(200, 80, 60, hull_assault_mesh);
 
-std::vector<HullPrototype> hull_prototypes = { assault, scout, heavy };
+inline std::vector<HullPrototype> hull_prototypes = { assault, scout, heavy };
 
+inline MissileMesh assault_missile_mesh = MissileMesh(
+	{ {-5, 0.0}, {5, 0.0}, {5, 20}, {-5, 20} },
+	{ {0.0, 20}, {0.0, 1.0} },
+	olc::WHITE
+).GetScaledMesh(_scale_factor);
+
+inline MissilePrototype assault_missile(10, 200, assault_missile_mesh);
+
+inline WeaponPrototype assault_cannon(50, weapon_assault_cannon_mesh, assault_missile);
 
 

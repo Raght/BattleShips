@@ -25,6 +25,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Missile.cpp" />
     <ClCompile Include="PhysicsObject.cpp" />
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="Team.cpp" />
@@ -34,7 +35,8 @@
     <ClInclude Include="Bar.h" />
     <ClInclude Include="ControlScheme.h" />
     <ClInclude Include="GameObject.h" />
-    <ClInclude Include="Globals.h" />
+    <ClInclude Include="GlobalsMechanics.h" />
+    <ClInclude Include="GlobalsData.h" />
     <ClInclude Include="Hull.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="Mesh.h" />

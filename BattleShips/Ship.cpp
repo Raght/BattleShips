@@ -12,8 +12,7 @@ Ship::Ship(const HullPrototype& hull_prototype, const WeaponPrototype& weapon_pr
 	acceleration = 0 * direction;
 
 	hull = Hull(hull_prototype, position, direction);
-	weapon = Weapon(weapon_prototype, position, direction);
-
+	weapon = Weapon(weapon_prototype, hull.mesh.weapon_to_ship_origin.position, hull.mesh.weapon_to_ship_origin.direction);
 
 
 	this->name = name;
@@ -24,8 +23,19 @@ Ship::Ship(const HullPrototype& hull_prototype, const WeaponPrototype& weapon_pr
 void Ship::SetAcceleration(olc::vf2d new_acceleration)
 {
 	acceleration = new_acceleration;
-	hull.acceleration = new_acceleration;
-	weapon.acceleration = new_acceleration;
+}
+
+void Ship::Move(olc::vf2d move)
+{
+	position += move;
+	hull.Move(move);
+	weapon.Move(move);
+}
+
+void Ship::SetPosition(olc::vf2d new_position)
+{
+	olc::vf2d move = new_position - position;
+	Move(move);
 }
 
 
@@ -34,8 +44,8 @@ void Ship::Rotate(olc::vf2d point, float degrees)
 	float radians = Radians(degrees);
 
 	direction = RotateVector(direction, radians);
-	hull.mesh.Rotate(position, radians);
-	weapon.mesh.Rotate(position, radians);
+	hull.mesh.Rotate(position, degrees);
+	weapon.mesh.Rotate(position, degrees);
 }
 
 void Ship::UpdatePosition(float fElapsedTime)
@@ -50,7 +60,8 @@ void Ship::UpdatePosition(float fElapsedTime)
 		new_velocity = new_velocity / new_velocity.mag() * hull.maxVelocity;
 
 	velocity = new_velocity;
-	position += velocity * fElapsedTime;
+	olc::vf2d new_position = position + velocity * fElapsedTime;
+	SetPosition(new_position);
 }
 
 
@@ -68,7 +79,7 @@ void Ship::TurnRight(float degrees)
 
 void Ship::AccelerateForward()
 {
-	olc::vf2d new_acceleration = maxAcceleration * direction;
+	olc::vf2d new_acceleration = hull.maxAcceleration * direction;
 	if (acceleration.mag2() > new_acceleration.mag2())
 		return;
 	SetAcceleration(new_acceleration);
@@ -81,16 +92,16 @@ void Ship::StopAccelerating()
 
 void Ship::Brake()
 {
-	olc::vf2d new_acceleration = -maxAcceleration * direction;
+	olc::vf2d new_acceleration = -hull.maxAcceleration * direction;
 	if (new_acceleration.dot(velocity) > 0.0f)
 		StopAccelerating();
 	else
 		SetAcceleration(new_acceleration);
 }
 
-void Ship::TryShoot()
+void Ship::TryShoot(std::vector<Missile>& missiles)
 {
-	this->TakeDamage(10);
+	weapon.TryShoot(missiles);
 }
 
 void Ship::TakeDamage(float damage)
