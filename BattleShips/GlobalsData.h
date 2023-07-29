@@ -58,9 +58,10 @@ inline HullPrototype heavy(200, 80, 60, hull_assault_mesh);
 
 inline std::vector<HullPrototype> hull_prototypes = { assault, scout, heavy };
 
-inline MissileMesh assault_missile_mesh = MissileMesh(
+inline Mesh assault_missile_mesh = Mesh(
+	{0.0, 20},
+	{0.0, 1.0},
 	{ {-5, 0.0}, {5, 0.0}, {5, 20}, {-5, 20} },
-	{ {0.0, 20}, {0.0, 1.0} },
 	olc::WHITE
 ).GetScaledMesh(_scale_factor);
 
