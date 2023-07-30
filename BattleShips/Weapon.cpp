@@ -2,39 +2,29 @@
 
 
 
-WeaponPrototype::WeaponPrototype()
-{
+WeaponPrototype::WeaponPrototype() { }
 
+WeaponPrototype::WeaponPrototype(const Mesh& _mesh,
+	const MissilePrototype& _missilePrototype, const std::vector<GameObject>& firing_positions,
+	int32_t _maxAmmo, int32_t _missilesPerShot, int32_t _ammoPerShot)
+	: missilePrototype(_missilePrototype), maxAmmo(_maxAmmo), missilesPerShot(_missilesPerShot), ammoPerShot(_ammoPerShot)
+{
+	mesh = _mesh;
+	childrenGameObjects = firing_positions;
 }
 
-WeaponPrototype::WeaponPrototype(int32_t maxAmmo, WeaponMesh mesh, MissilePrototype missilePrototype,
-	int32_t missilesPerShot, int32_t ammoPerShot)
-	: maxAmmo(maxAmmo), mesh(mesh), missilePrototype(missilePrototype), missilesPerShot(missilesPerShot), ammoPerShot(ammoPerShot)
-{
 
-}
+Weapon::Weapon() { }
 
-
-Weapon::Weapon()
-{
-
-}
-
-Weapon::Weapon(const WeaponPrototype& weapon_prototype, olc::vf2d position, olc::vf2d direction)
+Weapon::Weapon(olc::vf2d position, olc::vf2d direction, const WeaponPrototype& weapon_prototype)
 	: WeaponPrototype(weapon_prototype)
 {
 	ammo = weapon_prototype.maxAmmo;
 
-	mesh.Translate(position - mesh.weapon_to_ship_origin.position);
+	mesh.Move(position - mesh.weapon_to_ship_origin.position);
 	mesh.Rotate(mesh.weapon_to_ship_origin.position, Degrees(AngleBetweenToRotateAntiClockwise(mesh.weapon_to_ship_origin.direction, direction)));
 
-	random_firing_positions_distribution = std::uniform_int_distribution<int>(0, mesh.missile_origins.size() - 1);
-}
-
-void Weapon::Move(olc::vf2d move)
-{
-	GameObject::Move(move);
-	mesh.Translate(move);
+	random_firing_positions_distribution = std::uniform_int_distribution<int>(0, childrenGameObjects.size() - 1);
 }
 
 
@@ -57,7 +47,7 @@ bool Weapon::TryShoot(std::vector<Missile>& missiles)
 		}
 		firing_origin_indexes.insert(firing_origin_index);
 
-		PositionedVector firing_origin = mesh.missile_origins[firing_origin_index];
+		GameObject firing_origin = childrenGameObjects[firing_origin_index];
 		Missile missile = Missile(missilePrototype, firing_origin.position, firing_origin.direction);
 		missiles.push_back(missile);
 	}

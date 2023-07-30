@@ -26,7 +26,7 @@ Missile::Missile(MissilePrototype missile_prototype,
 	this->velocity = velocityMagnitude * direction;
 	this->acceleration = accelerationMagnitude * direction;
 
-	mesh.Translate(position - mesh.tip_of_the_weapon_origin.position);
+	mesh.Move(position - mesh.tip_of_the_weapon_origin.position);
 	mesh.Rotate(mesh.tip_of_the_weapon_origin.position, Degrees(AngleBetweenToRotateAntiClockwise(mesh.tip_of_the_weapon_origin.direction, direction)));
 
 	this->lifetimeSeconds = lifetimeSeconds;
@@ -36,5 +36,5 @@ void Missile::UpdatePosition(float fElapsedTime)
 {
 	PhysicsObject::UpdatePosition(fElapsedTime);
 
-	mesh.Translate(position - mesh.tip_of_the_weapon_origin.position);
+	mesh.Move(position - mesh.tip_of_the_weapon_origin.position);
 }

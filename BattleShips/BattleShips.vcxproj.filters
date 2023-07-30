@@ -86,7 +86,7 @@
     <ClInclude Include="PhysicsObject.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="GlobalsData.h">
+    <ClInclude Include="GlobalsContent.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="GameSettings.h">

@@ -36,7 +36,7 @@
     <ClInclude Include="ControlScheme.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GlobalsMechanics.h" />
-    <ClInclude Include="GlobalsData.h" />
+    <ClInclude Include="GlobalsContent.h" />
     <ClInclude Include="Hull.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="Mesh.h" />

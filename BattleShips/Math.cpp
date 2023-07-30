@@ -1,6 +1,13 @@
 #include "Math.h"
 
 
+float Mod(float a, float b)
+{
+	if (a > 0)
+		return a - (int)(a / b) * b;
+	return a - ((int)(a / b) - 1) * b;
+}
+
 bool InRange(float number, float range_min, float range_max)
 {
 	return range_min <= number && number <= range_max;

@@ -8,7 +8,7 @@
 #include "Team.h"
 #include "GameSettings.h"
 #include "GlobalsMechanics.h"
-#include "GlobalsData.h"
+#include "GlobalsContent.h"
 
 
 
@@ -130,29 +130,28 @@ public:
 		}
 	}
 
-	void DrawPolygon(const std::vector<olc::vf2d>& points, olc::Pixel color)
+	void DrawGameObject(const GameObject& game_object)
 	{
-		if (points.size() <= 2)
-			return;
-
-		for (int i = 0; i < points.size() - 1; i++)
+		if (game_object.mesh.points.size() == 0)
 		{
-			DrawLine(ToScreenSpace(points[i]), ToScreenSpace(points[i + 1]), color);
+			return;
 		}
-		DrawLine(ToScreenSpace(points[points.size() - 1]), ToScreenSpace(points[0]), color);
-	}
+		else if (game_object.mesh.points.size() == 1)
+		{
+			FillCircle(game_object.position + game_object.mesh.points[0], 1, game_object.mesh.color);
+			return;
+		}
 
-	void DrawShip(const Ship& ship)
-	{
-		DrawPolygon(ship.hull.mesh.points, ship.hull.mesh.color);
-		DrawPolygon(ship.weapon.mesh.points, ship.weapon.mesh.color);
+		for (int i = 0; i < game_object.mesh.points.size() - 1; i++)
+		{
+			olc::vf2d position1 = game_object.position + game_object.mesh.points[i];
+			olc::vf2d position2 = game_object.position + game_object.mesh.points[i + 1];
+			DrawLine(ToScreenSpace(position1), ToScreenSpace(position2), game_object.mesh.color);
+		}
+		olc::vf2d position1 = game_object.position + game_object.mesh.points[game_object.mesh.points.size() - 1];
+		olc::vf2d position2 = game_object.position + game_object.mesh.points[0];
+		DrawLine(ToScreenSpace(position1), ToScreenSpace(position2), game_object.mesh.color);
 	}
-
-	void DrawMissile(const Missile& missile)
-	{
-		DrawPolygon(missile.mesh.points, missile.mesh.color);
-	}
-
 
 	
 	bool OnUserCreate() override
@@ -194,12 +193,7 @@ public:
 		return true;
 	}
 
-	float mod(float a, float b)
-	{
-		if (a > 0)
-			return a - (int)(a / b) * b;
-		return a - ((int)(a / b) - 1) * b;
-	}
+	
 
 	bool OnUserUpdate(float fElapsedTime) override
 	{
@@ -216,7 +210,7 @@ public:
 		for (Ship& ship : ships)
 		{
 			ship.UpdatePosition(fElapsedTime);
-			olc::vf2d position_mod = { mod(ship.position.x, SCREEN_WIDTH), mod(ship.position.y, SCREEN_HEIGHT) };
+			olc::vf2d position_mod = { Mod(ship.position.x, SCREEN_WIDTH), Mod(ship.position.y, SCREEN_HEIGHT) };
 			ship.SetPosition(position_mod);
 
 			//DrawCircle(ToScreenSpace(ship.weapon.mesh.missile_origins[0].position), 10);
@@ -230,7 +224,13 @@ public:
 
 		for (Ship& ship : ships)
 		{
-			DrawShip(ship);
+			DrawGameObject(ship.hull);
+			DrawGameObject(ship.weapon);
+		}
+
+		for (Missile& missile : missiles)
+		{
+			DrawGameObject(missile);
 		}
 
 		for (Ship& ship : ships)
@@ -252,12 +252,6 @@ public:
 			Bar ammo_bar = Bar(ammo_bar_position, UI_bar_size, ship.weapon.ammo, ship.weapon.maxAmmo);
 			DrawAmmoBar(ammo_bar);
 		}
-
-		for (Missile& missile : missiles)
-		{
-			DrawMissile(missile);
-		}
-
 
 		return true;
 	}

@@ -6,27 +6,26 @@
 #include <unordered_set>
 
 
-class WeaponPrototype
+class WeaponPrototype : public GameObject
 {
 public:
 	WeaponPrototype();
-	WeaponPrototype(int32_t maxAmmo, WeaponMesh mesh, MissilePrototype missilePrototype, int32_t missilesPerShot = 1, int32_t ammoPerShot = 1);
+	WeaponPrototype(const Mesh& mesh,
+		const MissilePrototype& missilePrototype, const std::vector<GameObject>& firing_positions,
+		int32_t maxAmmo, int32_t missilesPerShot = 1, int32_t ammoPerShot = 1);
 
 	int32_t maxAmmo;
 	int32_t missilesPerShot = 1;
 	int32_t ammoPerShot = missilesPerShot;
-	WeaponMesh mesh;
 	MissilePrototype missilePrototype;
 };
 
 
-class Weapon : public GameObject, public WeaponPrototype
+class Weapon : public WeaponPrototype
 {
 public:
 	Weapon();
-	Weapon(const WeaponPrototype& weapon_prototype, olc::vf2d position, olc::vf2d direction);
-
-	void Move(olc::vf2d move);
+	Weapon(olc::vf2d position, olc::vf2d direction, const WeaponPrototype& weapon_prototype);
 
 	int32_t ammo;
 

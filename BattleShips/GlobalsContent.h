@@ -36,7 +36,7 @@ inline Mesh quad(
 
 inline float _scale_factor = 20.0f / 27 * 4 / 3;
 
-inline HullMesh hull_assault_mesh = HullMesh(
+inline Mesh hull_assault_mesh = HullMesh(
 	{ {-45, 0}, {45, 0}, {45, 30}, {-45, 30} },
 	{ { 0, 15 }, {0, 1} },
 	{ { 0, 0 }, {0, 1} },
@@ -68,5 +68,3 @@ inline Mesh assault_missile_mesh = Mesh(
 inline MissilePrototype assault_missile(10, 200, assault_missile_mesh);
 
 inline WeaponPrototype assault_cannon(50, weapon_assault_cannon_mesh, assault_missile);
-
-

@@ -2,38 +2,13 @@
 
 
 
-Polygon::Polygon()
-{
-
-}
-
-Polygon::Polygon(const std::vector<olc::vf2d>& points)
-	: points(points)
-{
-
-}
-
-PositionedVector::PositionedVector()
-	: position(0.0, 0.0), direction(1.0, 0.0)
-{
-
-}
-
-PositionedVector::PositionedVector(olc::vf2d position, olc::vf2d direction)
-	: position(position), direction(direction)
-{
-
-}
-
-
-
 Mesh::Mesh()
 {
-
+	*this = MISSING_MESH;
 }
 
-Mesh::Mesh(olc::vf2d center, olc::vf2d rotation, const std::vector<olc::vf2d>& mesh_points, olc::Pixel mesh_color)
-	: center(center), rotation(rotation), points(mesh_points), color(mesh_color)
+Mesh::Mesh(olc::vf2d center, olc::vf2d direction, const std::vector<olc::vf2d>& mesh_points, olc::Pixel mesh_color)
+	: center(center), direction(direction), points(mesh_points), color(mesh_color)
 {
 	
 }
@@ -96,7 +71,7 @@ Mesh Mesh::GetScaledMesh(float scale_factor)
 	return GetScaledMesh(scale_factor, center);
 }
 
-void Mesh::Translate(olc::vf2d move)
+void Mesh::Move(olc::vf2d move)
 {
 	for (olc::vf2d& point : points)
 	{
@@ -107,7 +82,7 @@ void Mesh::Translate(olc::vf2d move)
 Mesh Mesh::ReturnTranslatedMesh(olc::vf2d move)
 {
 	Mesh translated_mesh = *this;
-	translated_mesh.Translate(move);
+	translated_mesh.Move(move);
 	return translated_mesh;
 }
 
@@ -124,5 +99,17 @@ Mesh Mesh::ReturnRotatedMesh(olc::vf2d rotation_origin, float degrees)
 {
 	Mesh rotated_mesh = *this;
 	rotated_mesh.Rotate(rotation_origin, degrees);
+	return rotated_mesh;
+}
+
+void Mesh::Rotate(float degrees)
+{
+	Rotate(center, degrees);
+}
+
+Mesh Mesh::ReturnRotatedMesh(float degrees)
+{
+	Mesh rotated_mesh = *this;
+	rotated_mesh.Rotate(center, degrees);
 	return rotated_mesh;
 }

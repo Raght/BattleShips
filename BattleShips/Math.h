@@ -8,6 +8,8 @@ inline const float PI = 3.141592653589793238462643383279f;
 inline const float EPSILON = 1e-5f;
 
 
+float Mod(float a, float b);
+
 bool InRange(float number, float range_min, float range_max);
 
 bool InRange2(float number, float middle, float range_span_from_middle);

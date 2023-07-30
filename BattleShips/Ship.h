@@ -35,18 +35,10 @@ public:
 	void DealDamage(float damage, Ship& ship);
 	bool IsDead();
 
-	//float& health;
-	//float& maxHealth;
-	//float& maxVelocity;
-	//float& maxAcceleration;
-
 	Hull hull;
 	Weapon weapon;
 
-	olc::vf2d direction;
-
 	olc::vi2d sizeBoundingBox;
-
 
 	std::string name;
 	Team team;
