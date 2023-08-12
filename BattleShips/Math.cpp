@@ -64,8 +64,9 @@ float AngleBetween(olc::vf2d v1, olc::vf2d v2)
 float AngleBetweenToRotateAntiClockwise(olc::vf2d unit_vector_from, olc::vf2d unit_vector_to)
 {
 	std::complex<float> c1 = { unit_vector_from.x, unit_vector_from.y };
+	std::complex<float> c1_conjugate = { unit_vector_from.x, -unit_vector_from.y };
 	std::complex<float> c2 = { unit_vector_to.x, unit_vector_to.y };
-	c2 *= (-c1);
+	c2 *= c1_conjugate;
 	float x = c2.real(), y = c2.imag();
 	float angle = AngleBetween(unit_vector_from, unit_vector_to);
 	if (y > 0)
@@ -88,12 +89,12 @@ olc::vf2d RotateVector(olc::vf2d v, float radians)
 }
 
 
-olc::vf2d RotateVectorAroundPoint(olc::vf2d v, olc::vf2d point, float radians)
+olc::vf2d RotatePointAroundOrigin(olc::vf2d point, olc::vf2d origin, float radians)
 {
-	v -= point;
-	v = RotateVector(v, radians);
-	v += point;
+	point -= origin;
+	point = RotateVector(point, radians);
+	point += origin;
 
-	return v;
+	return point;
 }
 

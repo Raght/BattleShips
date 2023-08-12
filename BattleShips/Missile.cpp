@@ -1,40 +1,32 @@
 #include "Missile.h"
 
 
-MissilePrototype::MissilePrototype()
-{
-
-}
-
-MissilePrototype::MissilePrototype(float damage, float velocity, MissileMesh mesh, float acceleration)
-	: damage(damage), velocityMagnitude(velocity), mesh(mesh), accelerationMagnitude(acceleration)
-{
-
-}
 
 Missile::Missile()
 {
 
 }
 
-Missile::Missile(MissilePrototype missile_prototype,
-	olc::vf2d position, olc::vf2d direction,
-	float lifetimeSeconds)
-	: MissilePrototype(missile_prototype)
+Missile::Missile(const Mesh& _missile_mesh,
+	float _damage, float _velocity,
+	float _lifetime_seconds,
+	olc::vf2d _position, olc::vf2d _direction,
+	float _acceleration)
+	: PhysicsObject(_position, _direction, { 0, 0 }, { 0, 1.0 }, _missile_mesh),
+	damage(_damage), velocityMagnitude(_velocity), accelerationMagnitude(_acceleration)
 {
-	this->position = position;
-	this->velocity = velocityMagnitude * direction;
-	this->acceleration = accelerationMagnitude * direction;
+	velocity = _velocity * direction;
+	acceleration = _acceleration * direction;
 
-	mesh.Move(position - mesh.tip_of_the_weapon_origin.position);
-	mesh.Rotate(mesh.tip_of_the_weapon_origin.position, Degrees(AngleBetweenToRotateAntiClockwise(mesh.tip_of_the_weapon_origin.direction, direction)));
-
-	this->lifetimeSeconds = lifetimeSeconds;
+	lifetimeSeconds = _lifetime_seconds;
 }
 
-void Missile::UpdatePosition(float fElapsedTime)
+// TODO: does it call the GameObject constructor?
+Missile::Missile(const Missile& _missile, olc::vf2d _position, olc::vf2d _direction)
+	: Missile(_missile)
 {
-	PhysicsObject::UpdatePosition(fElapsedTime);
-
-	mesh.Move(position - mesh.tip_of_the_weapon_origin.position);
+	MoveTo(_position);
+	AlignDirection(_direction);
+	velocity = _missile.velocityMagnitude * direction;
+	acceleration = _missile.accelerationMagnitude * direction;
 }

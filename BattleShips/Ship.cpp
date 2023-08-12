@@ -2,21 +2,24 @@
 
 
 
-Ship::Ship(const HullPrototype& hull_prototype, const WeaponPrototype& weapon_prototype,
+Ship::Ship(const Hull& _hull, const Weapon& _weapon,
 	olc::vf2d initial_position, olc::vf2d initial_direction,
-	const std::string& name, Team team, float initial_velocity)
+	const std::string& _name, Team _team, float initial_velocity)
 {
 	position = initial_position;
 	direction = initial_direction;
 	velocity = initial_velocity * direction;
 	acceleration = 0 * direction;
 
-	hull = Hull(hull_prototype, position, direction);
-	weapon = Weapon(weapon_prototype, hull.mesh.weapon_to_ship_origin.position, hull.mesh.weapon_to_ship_origin.direction);
+	hull = _hull;
+	hull.MoveTo(initial_position);
+	hull.AlignDirection(initial_direction);
+	weapon = _weapon;
+	weapon.MoveTo(hull.childrenGameObjects[0].position);
+	weapon.AlignDirection(hull.childrenGameObjects[0].direction);
 
-
-	this->name = name;
-	this->team = team;
+	name = _name;
+	team = _team;
 }
 
 
@@ -44,8 +47,8 @@ void Ship::Rotate(olc::vf2d point, float degrees)
 	float radians = Radians(degrees);
 
 	direction = RotateVector(direction, radians);
-	hull.mesh.Rotate(position, degrees);
-	weapon.mesh.Rotate(position, degrees);
+	hull.Rotate(position, degrees);
+	weapon.Rotate(position, degrees);
 }
 
 void Ship::UpdatePosition(float fElapsedTime)

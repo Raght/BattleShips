@@ -1,27 +1,15 @@
 #pragma once
-#include "PhysicsObject.h"
-#include "Mesh.h"
+#include "GameObject.h"
 
 
-class HullPrototype : public GameObject
-{
-public:
-	HullPrototype();
-	HullPrototype(const Mesh& mesh, float maxHealth, float maxVelocity, float maxAcceleration);
-
-	float maxHealth;
-	float maxVelocity;
-	float maxAcceleration;
-};
-
-
-class Hull : public HullPrototype
+class Hull : public GameObject
 {
 public:
 	Hull();
-	Hull(olc::vf2d position, olc::vf2d direction, const HullPrototype& hull_prototype);
-
-	void Move(olc::vf2d move);
+	Hull(const Prefab& hull_prefab, float maxHealth, float maxVelocity, float maxAcceleration, olc::vf2d position = { 0.0, 0.0 }, olc::vf2d direction = { 0.0, 1.0 });
 
 	float health;
+	float maxHealth;
+	float maxVelocity;
+	float maxAcceleration;
 };

@@ -13,7 +13,7 @@
 class Ship : public PhysicsObject
 {
 public:
-	Ship(const HullPrototype& hull_prototype, const WeaponPrototype& weapon_prototype,
+	Ship(const Hull& hull, const Weapon& weapon,
 		olc::vf2d initial_position, olc::vf2d initial_direction,
 		const std::string& name, Team team, float initial_velocity = 0);
 

@@ -108,8 +108,6 @@ public:
 			
 			if (AllKeyStatesPositive(key_state_action))
 			{
-				std::vector<Missile> missiles_to_add;
-
 				if (action == Action::TURN_LEFT)
 					ship.TurnLeft(player.control_scheme.turningSpeedDegreesPerSecond * fElapsedTime);
 				else if (action == Action::TURN_RIGHT)
@@ -119,9 +117,7 @@ public:
 				else if (action == Action::STOP)
 					ship.Brake();
 				else if (action == Action::SHOOT)
-					ship.TryShoot(missiles_to_add);
-
-				AddMissiles(missiles_to_add);
+					ship.TryShoot(missiles);
 			}
 			else
 			{
@@ -130,36 +126,48 @@ public:
 		}
 	}
 
-	void DrawGameObject(const GameObject& game_object)
+	void DrawGameObject(GameObject& game_object)
 	{
-		if (game_object.mesh.points.size() == 0)
+		for (int i = 0; i <= game_object.childrenGameObjects.size(); i++)
 		{
-			return;
-		}
-		else if (game_object.mesh.points.size() == 1)
-		{
-			FillCircle(game_object.position + game_object.mesh.points[0], 1, game_object.mesh.color);
-			return;
-		}
+			GameObject* p_game_object_to_draw = &game_object;
+			if (i != game_object.childrenGameObjects.size())
+				p_game_object_to_draw = &game_object.childrenGameObjects[i];
 
-		for (int i = 0; i < game_object.mesh.points.size() - 1; i++)
-		{
-			olc::vf2d position1 = game_object.position + game_object.mesh.points[i];
-			olc::vf2d position2 = game_object.position + game_object.mesh.points[i + 1];
-			DrawLine(ToScreenSpace(position1), ToScreenSpace(position2), game_object.mesh.color);
+			GameObject& game_object_to_draw = *p_game_object_to_draw;
+
+			for (const Shape& polygon : game_object_to_draw.mesh.polygons)
+			{
+				if (polygon.points.size() == 0)
+				{
+					return;
+				}
+				else if (polygon.points.size() == 1)
+				{
+					FillCircle(ToScreenSpace(polygon.points[0]), 1, polygon.color);
+					return;
+				}
+
+				for (int i = 0; i < polygon.points.size() - 1; i++)
+				{
+					olc::vf2d position1 = polygon.points[i];
+					olc::vf2d position2 = polygon.points[i + 1];
+					DrawLine(ToScreenSpace(position1), ToScreenSpace(position2), polygon.color);
+				}
+				olc::vf2d position1 = polygon.points[polygon.points.size() - 1];
+				olc::vf2d position2 = polygon.points[0];
+				DrawLine(ToScreenSpace(position1), ToScreenSpace(position2), polygon.color);
+			}
 		}
-		olc::vf2d position1 = game_object.position + game_object.mesh.points[game_object.mesh.points.size() - 1];
-		olc::vf2d position2 = game_object.position + game_object.mesh.points[0];
-		DrawLine(ToScreenSpace(position1), ToScreenSpace(position2), game_object.mesh.color);
 	}
 
 	
 	bool OnUserCreate() override
 	{
-		for (int i = 0; i < hull_prototypes.size(); i++)
+		for (int i = 0; i < available_hulls.size(); i++)
 		{
-			HullPrototype& hull_prototype = hull_prototypes[i];
-			WeaponPrototype& weapon_prototype = assault_cannon;
+			Hull& hull_prototype = available_hulls[i];
+			Weapon& weapon_prototype = assault_cannon;
 			std::string name;
 			Team team;
 			if (i == 0)
@@ -179,7 +187,8 @@ public:
 			}
 
 			olc::vf2d initial_position = { distribution_field_width(rng), distribution_field_height(rng) };
-			float angle = distribution_angles(rng);
+			//float angle = distribution_angles(rng);
+			float angle = 0;
 			olc::vf2d initial_direction = { cosf(angle), sinf(angle) };
 			float initial_velocity = distribution_velocities(rng);
 
@@ -232,6 +241,8 @@ public:
 		{
 			DrawGameObject(missile);
 		}
+
+		std::cout << missiles.size() << ' ' << '\n';
 
 		for (Ship& ship : ships)
 		{

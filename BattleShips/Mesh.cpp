@@ -2,26 +2,28 @@
 
 
 
+Shape::Shape()
+{
+
+}
+
+Shape::Shape(const std::vector<olc::vf2d>& _points, olc::Pixel _color)
+	: points(_points), color(_color)
+{
+
+}
+
+
+
 Mesh::Mesh()
 {
-	*this = MISSING_MESH;
+	//*this = MISSING_MESH;
 }
 
-Mesh::Mesh(olc::vf2d center, olc::vf2d direction, const std::vector<olc::vf2d>& mesh_points, olc::Pixel mesh_color)
-	: center(center), direction(direction), points(mesh_points), color(mesh_color)
+Mesh::Mesh(olc::vf2d _center, olc::vf2d _direction, const std::vector<Shape>& _polygons)
+	: center(_center), direction(_direction)
 {
-	
-}
-
-void Mesh::PrintData()
-{
-	std::cout << "Points: \n";
-	for (olc::vf2d& v : points)
-	{
-		std::cout << v.x << ' ' << v.y << '\n';
-	}
-	std::cout << "\nColor: \n";
-	std::cout << '(' << (uint32_t)color.r << ", " << (uint32_t)color.g << ", " << (uint32_t)color.b << ")\n\n";
+	polygons = _polygons;
 }
 
 void Mesh::ScalePoint(olc::vf2d& point, float scale_factor, olc::vf2d center)
@@ -38,10 +40,14 @@ olc::vf2d Mesh::GetScaledPoint(olc::vf2d point, float scale_factor, olc::vf2d ce
 
 void Mesh::Scale(float scale_factor, olc::vf2d center)
 {
-	for (olc::vf2d& point : points)
+	for (Shape& polygon : polygons)
 	{
-		ScalePoint(point, scale_factor, center);
+		for (olc::vf2d& point : polygon.points)
+		{
+			ScalePoint(point, scale_factor, center);
+		}
 	}
+	ScalePoint(center, scale_factor, center);
 }
 
 Mesh Mesh::GetScaledMesh(float scale_factor, olc::vf2d center)
@@ -73,10 +79,14 @@ Mesh Mesh::GetScaledMesh(float scale_factor)
 
 void Mesh::Move(olc::vf2d move)
 {
-	for (olc::vf2d& point : points)
+	for (Shape& polygon : polygons)
 	{
-		point += move;
+		for (olc::vf2d& point : polygon.points)
+		{
+			point += move;
+		}
 	}
+	center += move;
 }
 
 Mesh Mesh::ReturnTranslatedMesh(olc::vf2d move)
@@ -89,10 +99,16 @@ Mesh Mesh::ReturnTranslatedMesh(olc::vf2d move)
 
 void Mesh::Rotate(olc::vf2d rotation_origin, float degrees)
 {
-	for (olc::vf2d& point : points)
+	for (Shape& polygon : polygons)
 	{
-		point = RotateVectorAroundPoint(point, rotation_origin, Radians(degrees));
+		for (olc::vf2d& point : polygon.points)
+		{
+			point = RotatePointAroundOrigin(point, rotation_origin, Radians(degrees));
+		}
 	}
+
+	center = RotatePointAroundOrigin(center, rotation_origin, Radians(degrees));
+	direction = RotateVector(direction, Radians(degrees));
 }
 
 Mesh Mesh::ReturnRotatedMesh(olc::vf2d rotation_origin, float degrees)

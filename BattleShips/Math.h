@@ -32,4 +32,4 @@ float AngleBetweenToRotateAntiClockwise(olc::vf2d unit_vector_from, olc::vf2d un
 
 olc::vf2d RotateVector(olc::vf2d v, float radians);
 
-olc::vf2d RotateVectorAroundPoint(olc::vf2d v, olc::vf2d point, float radians);
+olc::vf2d RotatePointAroundOrigin(olc::vf2d v, olc::vf2d point, float radians);

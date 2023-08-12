@@ -2,36 +2,16 @@
 
 
 
-HullPrototype::HullPrototype()
-{
-
-}
-
-HullPrototype::HullPrototype(const Mesh& mesh, float maxHealth, float maxVelocity, float maxAcceleration)
-	: mesh(mesh), maxHealth(maxHealth), maxVelocity(maxVelocity), maxAcceleration(maxAcceleration)
-{
-
-}
-
-
 Hull::Hull()
 {
 
 }
 
-Hull::Hull(olc::vf2d position, olc::vf2d direction, const HullPrototype& hull_prototype)
-	: HullPrototype(hull_prototype), GameObject(position)
+Hull::Hull(const Prefab& _hull_prefab,
+	float _maxHealth, float _maxVelocity, float _maxAcceleration,
+	olc::vf2d _position, olc::vf2d _direction)
+	: GameObject(_hull_prefab, _position, _direction),
+	health(_maxHealth), maxHealth(_maxHealth), maxVelocity(_maxVelocity), maxAcceleration(_maxAcceleration)
 {
-	health = hull_prototype.maxHealth;
-
 	
-	mesh.Move(position - mesh.ship_origin.position);
-	mesh.Rotate(mesh.ship_origin.position, Degrees(AngleBetweenToRotateAntiClockwise(mesh.ship_origin.direction, direction)));
 }
-
-void Hull::Move(olc::vf2d move)
-{
-	GameObject::Move(move);
-	mesh.Move(move);
-}
-

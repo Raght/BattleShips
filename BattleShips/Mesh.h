@@ -4,29 +4,21 @@
 #include <vector>
 
 
-inline const Mesh EMPTY_MESH = Mesh();
-inline const Mesh MISSING_MESH = Mesh(
-	{ 0.0, 0.0 },
-	{ 1, 0 },
-	{ {0.5, 0.5}, {-0.5, 0.5}, {-0.5, -0.5}, {0.5, -0.5} },
-	olc::MAGENTA
-);
-inline const Mesh DOT_MESH = Mesh(
-	{ 0.0, 0.0 },
-	{ 1, 0 },
-	{ {0.0, 0.0} },
-	olc::WHITE
-);
 
+struct Shape
+{
+	Shape();
+	Shape(const std::vector<olc::vf2d>& points, olc::Pixel color);
+
+	std::vector<olc::vf2d> points;
+	olc::Pixel color;
+};
 
 class Mesh
 {
 public:
 	Mesh();
-	Mesh(olc::vf2d center, olc::vf2d direction, const std::vector<olc::vf2d>& mesh_points, olc::Pixel mesh_color);
-
-	void PrintData();
-
+	Mesh(olc::vf2d center, olc::vf2d direction, const std::vector<Shape>& mesh_points);
 	
 	void ScalePoint(olc::vf2d& point, float scale_factor, olc::vf2d center);
 	olc::vf2d GetScaledPoint(olc::vf2d point, float scale_factor, olc::vf2d center);
@@ -49,6 +41,5 @@ public:
 
 	olc::vf2d center;
 	olc::vf2d direction;
-	std::vector<olc::vf2d> points;
-	olc::Pixel color;
+	std::vector<Shape> polygons;
 };
