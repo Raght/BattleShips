@@ -64,7 +64,7 @@ public:
 	
 	void DrawAmmoBar(Bar& bar)
 	{
-		DrawBar(bar, olc::WHITE, olc::GREY);
+		DrawBar(bar, olc::WHITE, olc::DARK_GREY);
 	}
 
 	
@@ -187,8 +187,8 @@ public:
 			}
 
 			olc::vf2d initial_position = { distribution_field_width(rng), distribution_field_height(rng) };
-			//float angle = distribution_angles(rng);
-			float angle = 0;
+			float angle = distribution_angles(rng);
+			//float angle = 0;
 			olc::vf2d initial_direction = { cosf(angle), sinf(angle) };
 			float initial_velocity = distribution_velocities(rng);
 
@@ -209,13 +209,13 @@ public:
 		Clear(olc::BLACK);
 
 		// Game logic
-		
+
 		for (Player& player : players)
 		{
 			ControlShip(player, fElapsedTime);
 		}
 
-		
+
 		for (Ship& ship : ships)
 		{
 			ship.UpdatePosition(fElapsedTime);
@@ -223,6 +223,20 @@ public:
 			ship.SetPosition(position_mod);
 
 			//DrawCircle(ToScreenSpace(ship.weapon.mesh.missile_origins[0].position), 10);
+		}
+
+
+		std::vector<std::vector<Missile>::iterator> missiles_to_remove;
+		for (int i = 0; i < missiles.size(); i++)
+		{
+			Missile& missile = missiles[i];
+			missile.lifetime += fElapsedTime;
+			if (missile.LifetimeExceeded())
+				missiles_to_remove.push_back(missiles.begin() + i);
+		}
+		for (auto iterator : missiles_to_remove)
+		{
+			missiles.erase(iterator);
 		}
 
 		for (Missile& missile : missiles)
@@ -242,14 +256,14 @@ public:
 			DrawGameObject(missile);
 		}
 
-		std::cout << missiles.size() << ' ' << '\n';
+		//std::cout << missiles.size() << ' ' << '\n';
 
 		for (Ship& ship : ships)
 		{
-			FillCircle(ToScreenSpace(ship.position), 6, ship.team.color);
-			FillCircle(ToScreenSpace(ship.position), 3, olc::BLACK);
-			DrawLine(ToScreenSpace(ship.position), ToScreenSpace(ship.position + 100.0f * ship.direction), ship.team.color);
-			DrawLine(ToScreenSpace(ship.position), ToScreenSpace(ship.position + ship.velocity), olc::MAGENTA);
+			//FillCircle(ToScreenSpace(ship.position), 6, ship.team.color);
+			//FillCircle(ToScreenSpace(ship.position), 3, olc::BLACK);
+			//DrawLine(ToScreenSpace(ship.position), ToScreenSpace(ship.position + 100.0f * ship.direction), ship.team.color);
+			//DrawLine(ToScreenSpace(ship.position), ToScreenSpace(ship.position + ship.velocity), olc::MAGENTA);
 
 			float max_size = max(ship.sizeBoundingBox.x, ship.sizeBoundingBox.y);
 

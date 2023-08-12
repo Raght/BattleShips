@@ -91,7 +91,7 @@ inline Hull hull_heavy(hull_assault_gameobject, 200, 80, 60);
 inline std::vector<Hull> available_hulls = { hull_assault, hull_scout, hull_heavy };
 
 
-inline Missile assault_missile(assault_missile_mesh, 10, 200);
+inline Missile assault_missile(assault_missile_mesh, 10, 300);
 
 
 inline Weapon assault_cannon(weapon_assault_cannon_gameobject, assault_missile, 50);

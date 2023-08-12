@@ -132,5 +132,5 @@ float GameObject::Scale()
 
 bool GameObject::LifetimeExceeded() const
 {
-	return (lifetimeSeconds == -1.0f) || lifetime <= lifetimeSeconds;
+	return (lifetimeSeconds != -1.0f) && lifetime > lifetimeSeconds;
 }
