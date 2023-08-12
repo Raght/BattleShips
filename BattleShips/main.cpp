@@ -164,10 +164,16 @@ public:
 	
 	bool OnUserCreate() override
 	{
+		std::uniform_int_distribution<int> available_hulls_distribution(0, available_hulls.size() - 1);
+		std::uniform_int_distribution<int> available_weapons_distribution(0, available_weapons.size() - 1);
+
 		for (int i = 0; i < available_hulls.size(); i++)
 		{
-			Hull& hull_prototype = available_hulls[i];
-			Weapon& weapon_prototype = laser_cannon;
+			Hull& hull_prototype = available_hulls[available_hulls_distribution(rng)];
+			Weapon& weapon_prototype = available_weapons[available_weapons_distribution(rng)];
+			//weapon_prototype = assault_cannon;
+			//weapon_prototype = smg_cannon;
+			//weapon_prototype = laser_cannon;
 			std::string name;
 			Team team;
 			if (i == 0)

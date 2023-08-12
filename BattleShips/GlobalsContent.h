@@ -39,7 +39,8 @@ inline float _scale_factor = 0.85f;
 inline Mesh hull_assault_mesh = Mesh(
 	{ 0, 16 }, DIRECTION_UP,
 	{
-		Shape({{-50, 0}, {50, 0}, {50, 33}, {-50, 33} }, olc::GREEN)
+		Shape({{-50, 0}, {50, 0}, {50, 33}, {-50, 33} }, olc::GREEN),
+		Shape({ {-14, -2}, {14, -2}, {14, 55}, {-14, 55} }, olc::GREEN),
 	}
 );
 
@@ -47,7 +48,7 @@ inline GameObject hull_assault_gameobject = GameObject(
 	{ 0.0, 0.0 }, DIRECTION_UP,
 	hull_assault_mesh,
 	{
-		GameObject({0.0, 15}, DIRECTION_UP)
+		GameObject({0.0, 14}, DIRECTION_UP)
 	}
 ).GetScaledGameObject(_scale_factor);
 
@@ -64,7 +65,7 @@ inline Mesh assault_missile_mesh = Mesh(
 inline Mesh smg_missile_mesh = Mesh(
 	{ 0.0, 12 }, { 0.0, 1.0 },
 	{
-		Shape({ {-3, 0.0}, {3, 0.0}, {3, 12}, {-3, 12} }, olc::WHITE)
+		Shape({ {-2, 0.0}, {2, 0.0}, {2, 12}, {-2, 12} }, olc::WHITE)
 	}
 	);
 
@@ -82,7 +83,9 @@ inline Mesh laser_missile_mesh = Mesh(
 inline Mesh weapon_assault_cannon_mesh = Mesh(
 	{0, 33}, DIRECTION_UP,
 	{
-		Shape({ {-16, 0.0}, {16, 0.0}, {16, 67}, {-16, 67} }, olc::GREEN)
+		//Shape({ {-16, 0.0}, {16, 0.0}, {16, 67}, {-16, 67} }, olc::GREEN)
+		Shape({ {-40, 0.0}, {-28, 0.0}, {-28, 50}, {-40, 50} }, olc::GREEN),
+		Shape({ {40, 0.0}, {28, 0.0}, {28, 50}, {40, 50} }, olc::GREEN),
 	}
 );
 
@@ -90,7 +93,9 @@ inline GameObject weapon_assault_cannon_gameobject = GameObject(
 	{ 0, 0 }, DIRECTION_UP,
 	weapon_assault_cannon_mesh,
 	{
-		GameObject({0.0, 33.5}, DIRECTION_UP)
+		//GameObject({0.0, 33.5}, DIRECTION_UP)
+		GameObject({-34, 50 - 33}, DIRECTION_UP),
+		GameObject({34, 50 - 33}, DIRECTION_UP),
 	}
 ).GetScaledGameObject(_scale_factor);
 
@@ -98,9 +103,14 @@ inline GameObject weapon_assault_cannon_gameobject = GameObject(
 inline Mesh weapon_smg_cannon_mesh = Mesh(
 	{ 0, 33 }, DIRECTION_UP,
 	{
-		Shape({ {-12, 0.0}, {12, 0.0}, {12, 50}, {-12, 50} }, olc::GREEN),
-		Shape({ {-24, 0.0}, {-20, 0.0}, {-20, 45}, {-24, 45} }, olc::GREEN),
-		Shape({ {24, 0.0}, {20, 0.0}, {20, 45}, {24, 45} }, olc::GREEN),
+		//Shape({ {-24, 0.0}, {-20, 0.0}, {-20, 50}, {-24, 50} }, olc::GREEN),
+		//Shape({ {24, 0.0}, {20, 0.0}, {20, 50}, {24, 50} }, olc::GREEN),
+		//Shape({ {-34, 0.0}, {-30, 0.0}, {-30, 50}, {-34, 50} }, olc::GREEN),
+		//Shape({ {34, 0.0}, {30, 0.0}, {30, 50}, {34, 50} }, olc::GREEN)
+		Shape({ {-26, 0.0}, {-22, 0.0}, {-22, 50}, {-26, 50} }, olc::GREEN),
+		Shape({ {26, 0.0}, {22, 0.0}, {22, 50}, {26, 50} }, olc::GREEN),
+		Shape({ {-40, 0.0}, {-36, 0.0}, {-36, 46}, {-40, 46} }, olc::GREEN),
+		Shape({ {40, 0.0}, {36, 0.0}, {36, 46}, {40, 46} }, olc::GREEN),
 	}
 );
 
@@ -108,9 +118,14 @@ inline GameObject weapon_smg_cannon_gameobject = GameObject(
 	{ 0, 0 }, DIRECTION_UP,
 	weapon_smg_cannon_mesh,
 	{
-		GameObject({0.0, 50 - 33}, DIRECTION_UP),
-		GameObject({-22, 45 - 33}, DIRECTION_UP),
-		GameObject({22, 45 - 33}, DIRECTION_UP),
+		//GameObject({-22, 50 - 33}, DIRECTION_UP),
+		//GameObject({22, 50 - 33}, DIRECTION_UP),
+		//GameObject({-32, 50 - 33}, DIRECTION_UP),
+		//GameObject({32, 50 - 33}, DIRECTION_UP)
+		GameObject({-24, 50 - 33}, DIRECTION_UP),
+		GameObject({24, 50 - 33}, DIRECTION_UP),
+		GameObject({-38, 46 - 33}, DIRECTION_UP),
+		GameObject({38, 46 - 33}, DIRECTION_UP),
 	}
 ).GetScaledGameObject(_scale_factor);
 
@@ -118,7 +133,6 @@ inline GameObject weapon_smg_cannon_gameobject = GameObject(
 inline Mesh weapon_laser_cannon_mesh = Mesh(
 	{ 0, 33 }, DIRECTION_UP,
 	{
-		Shape({ {-12, 0.0}, {12, 0.0}, {12, 55}, {-12, 55} }, olc::GREEN),
 		Shape({ {-40, 0.0}, {-34, 0.0}, {-34, 50}, {-40, 50} }, olc::GREEN),
 		Shape({ {40, 0.0}, {34, 0.0}, {34, 50}, {40, 50} }, olc::GREEN),
 	}
@@ -128,7 +142,6 @@ inline GameObject weapon_laser_cannon_gameobject = GameObject(
 	{ 0, 0 }, DIRECTION_UP,
 	weapon_laser_cannon_mesh,
 	{
-		//GameObject({0.0, 50 - 33}, DIRECTION_UP),
 		GameObject({-37, 50 - 33}, DIRECTION_UP),
 		GameObject({37, 50 - 33}, DIRECTION_UP),
 	}
@@ -145,12 +158,12 @@ inline std::vector<Hull> available_hulls = { hull_assault, hull_scout, hull_heav
 
 
 inline Missile assault_missile(assault_missile_mesh, 10, 300);
-inline Missile smg_missile(smg_missile_mesh, 5, 300);
-inline Missile laser_missile(laser_missile_mesh, 5, 500);
+inline Missile smg_missile(smg_missile_mesh, 5, 400);
+inline Missile laser_missile(laser_missile_mesh, 7.5, 500);
 
 
 inline Weapon assault_cannon(weapon_assault_cannon_gameobject, assault_missile, 50);
-inline Weapon smg_cannon(weapon_smg_cannon_gameobject, assault_missile, 200);
+inline Weapon smg_cannon(weapon_smg_cannon_gameobject, smg_missile, 200);
 inline Weapon laser_cannon(weapon_laser_cannon_gameobject, laser_missile, 100);
 
 inline std::vector<Weapon> available_weapons = { assault_cannon, smg_cannon, laser_cannon };
