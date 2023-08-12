@@ -21,7 +21,7 @@ public:
 	int32_t ammoPerShot = missilesPerShot;
 	Missile missile;
 
-	bool TryShoot(std::vector<Missile>& missiles);
+	bool TryShoot(Team team, std::vector<Missile>& missiles);
 
 private:
 	std::uniform_int_distribution<int> m_randomFiringPositionsDistribution;

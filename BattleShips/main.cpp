@@ -1,10 +1,13 @@
 #define OLC_PGE_APPLICATION
-#include "olcPixelGameEngine.h"
+#include <vector>
+#include <unordered_set>
 #include <random>
-#include "Bar.h"
+#include "olcPixelGameEngine.h"
+#include "Collision.h"
 #include "Ship.h"
 #include "Missile.h"
 #include "Player.h"
+#include "Bar.h"
 #include "Team.h"
 #include "GameSettings.h"
 #include "GlobalsMechanics.h"
@@ -90,10 +93,33 @@ public:
 		return all_states_positive;
 	}
 
-	void AddMissiles(std::vector<Missile>& missiles_to_add)
+	bool ShipCollidesAnyOtherShip(const Ship& ship)
 	{
-		for (Missile& missile : missiles_to_add)
-			missiles.push_back(missile);
+		bool ship_collides_another_ship = false;
+		for (int i = 0; i < ships.size(); i++)
+			ship_collides_another_ship = ship_collides_another_ship || MeshVsMesh(ship.hull.mesh, ships[i].hull.mesh);
+		return ship_collides_another_ship;
+	}
+
+	bool ShipCollidesAnyOtherShip(int ship_index)
+	{
+		bool ship_collides_another_ship = false;
+		for (int i = 0; i < ship_index; i++)
+			ship_collides_another_ship = ship_collides_another_ship || MeshVsMesh(ships[ship_index].hull.mesh, ships[i].hull.mesh);
+		for (int i = ship_index + 1; i < ships.size(); i++)
+			ship_collides_another_ship = ship_collides_another_ship || MeshVsMesh(ships[ship_index].hull.mesh, ships[i].hull.mesh);
+		return ship_collides_another_ship;
+	}
+
+	void RemoveMissiles(std::unordered_set<int>& missiles_to_remove)
+	{
+		int missiles_removed = 0;
+		for (int missile_index : missiles_to_remove)
+		{
+			missiles.erase(missiles.begin() + missile_index - missiles_removed);
+			missiles_removed++;
+		}
+		missiles_to_remove.clear();
 	}
 
 	void ControlShip(Player& player, float fElapsedTime)
@@ -174,31 +200,23 @@ public:
 			//weapon_prototype = assault_cannon;
 			//weapon_prototype = smg_cannon;
 			//weapon_prototype = laser_cannon;
-			std::string name;
-			Team team;
-			if (i == 0)
-			{
-				name = "Player 1";
-				team = TEAM_GREEN;
-			}
-			else if (i == 1)
-			{
-				name = "Player 2";
-				team = TEAM_RED;
-			}
-			else
-			{
-				name = "Ship " + std::to_string(i);
-				team = TEAM_BLUE;
-			}
+			std::string name = "Player " + std::to_string(i + 1);
+			Team team = TEAMS[i];
 
-			olc::vf2d initial_position = { distribution_field_width(rng), distribution_field_height(rng) };
-			float angle = distribution_angles(rng);
-			//float angle = 0;
-			olc::vf2d initial_direction = { cosf(angle), sinf(angle) };
-			float initial_velocity = distribution_velocities(rng);
+			Ship ship_to_spawn; 
+			do
+			{
+				olc::vf2d initial_position = { distribution_field_width(rng), distribution_field_height(rng) };
+				float angle = distribution_angles(rng);
+				//float angle = 0;
+				olc::vf2d initial_direction = { cosf(angle), sinf(angle) };
+				float initial_velocity_magnitude = distribution_velocities(rng);
+				olc::vf2d initial_velocity = initial_direction * initial_velocity_magnitude;
 
-			ships.push_back(Ship(hull_prototype, weapon_prototype, initial_position, initial_direction, name, team, initial_velocity));
+				ship_to_spawn = Ship(hull_prototype, weapon_prototype, initial_position, initial_direction, name, team, initial_velocity);
+			} while (ShipCollidesAnyOtherShip(ship_to_spawn));
+			//} while (false);
+			ships.push_back(ship_to_spawn);
 			ships[i].sizeBoundingBox = { UI_character_size, UI_character_size };
 		}
 		players.push_back(Player(control_scheme_player_first, &ships[0]));
@@ -222,33 +240,47 @@ public:
 		}
 
 
-		for (Ship& ship : ships)
+		for (int i = 0; i < ships.size(); i++)
 		{
-			ship.UpdatePosition(fElapsedTime);
+			Ship& ship = ships[i];
+			
+			if (!ShipCollidesAnyOtherShip(i))
+				ship.UpdatePosition(fElapsedTime);
 			olc::vf2d position_mod = { Mod(ship.position.x, SCREEN_WIDTH), Mod(ship.position.y, SCREEN_HEIGHT) };
 			ship.SetPosition(position_mod);
 
 			//DrawCircle(ToScreenSpace(ship.weapon.mesh.missile_origins[0].position), 10);
 		}
 
-
-		std::vector<std::vector<Missile>::iterator> missiles_to_remove;
+		std::unordered_set<int> missiles_to_remove;
 		for (int i = 0; i < missiles.size(); i++)
 		{
 			Missile& missile = missiles[i];
 			missile.lifetime += fElapsedTime;
 			if (missile.LifetimeExceeded())
-				missiles_to_remove.push_back(missiles.begin() + i);
+				missiles_to_remove.insert(i);
 		}
-		for (auto iterator : missiles_to_remove)
-		{
-			missiles.erase(iterator);
-		}
+		RemoveMissiles(missiles_to_remove);
 
 		for (Missile& missile : missiles)
 		{
 			missile.UpdatePosition(fElapsedTime);
 		}
+
+		for (int i = 0; i < missiles.size(); i++)
+		{
+			Missile& missile = missiles[i];
+
+			for (Ship& ship : ships)
+			{
+				if (MeshVsMesh(missile.mesh, ship.hull.mesh) && missile.teamOfSender != ship.team)
+				{
+					ship.TakeDamage(missile.damage);
+					missiles_to_remove.insert(i);
+				}
+			}
+		}
+		RemoveMissiles(missiles_to_remove);
 
 
 		for (Ship& ship : ships)

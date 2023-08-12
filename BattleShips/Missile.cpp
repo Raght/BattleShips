@@ -22,11 +22,13 @@ Missile::Missile(const Mesh& _missile_mesh,
 }
 
 // TODO: does it call the GameObject constructor?
-Missile::Missile(const Missile& _missile, olc::vf2d _position, olc::vf2d _direction)
+Missile::Missile(const Missile& _missile, olc::vf2d _position, olc::vf2d _direction, Team _team_of_sender)
 	: Missile(_missile)
 {
 	MoveTo(_position);
 	AlignDirection(_direction);
 	velocity = _missile.velocityMagnitude * direction;
 	acceleration = _missile.accelerationMagnitude * direction;
+
+	teamOfSender = _team_of_sender;
 }

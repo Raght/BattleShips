@@ -2,13 +2,15 @@
 
 
 
+Ship::Ship() { }
+
 Ship::Ship(const Hull& _hull, const Weapon& _weapon,
 	olc::vf2d initial_position, olc::vf2d initial_direction,
-	const std::string& _name, Team _team, float initial_velocity)
+	const std::string& _name, Team _team, olc::vf2d initial_velocity)
 {
 	position = initial_position;
 	direction = initial_direction;
-	velocity = initial_velocity * direction;
+	velocity = initial_velocity;
 	acceleration = 0 * direction;
 
 	hull = _hull;
@@ -35,6 +37,11 @@ void Ship::Move(olc::vf2d move)
 	weapon.Move(move);
 }
 
+void Ship::MoveTo(olc::vf2d new_position)
+{
+	Move(new_position - position);
+}
+
 void Ship::SetPosition(olc::vf2d new_position)
 {
 	olc::vf2d move = new_position - position;
@@ -44,11 +51,20 @@ void Ship::SetPosition(olc::vf2d new_position)
 
 void Ship::Rotate(olc::vf2d point, float degrees)
 {
-	float radians = Radians(degrees);
-
-	direction = RotateVector(direction, radians);
+	direction = RotateVector(direction, Radians(degrees));
 	hull.Rotate(position, degrees);
 	weapon.Rotate(position, degrees);
+}
+
+void Ship::Rotate(float degrees)
+{
+	Rotate(position, degrees);
+}
+
+void Ship::AlignDirection(olc::vf2d new_direction)
+{
+	float degrees = Degrees(AngleBetweenToRotateAntiClockwise(direction, new_direction));
+	Rotate(degrees);
 }
 
 void Ship::UpdatePosition(float fElapsedTime)
@@ -104,7 +120,7 @@ void Ship::Brake()
 
 void Ship::TryShoot(std::vector<Missile>& missiles)
 {
-	weapon.TryShoot(missiles);
+	weapon.TryShoot(team, missiles);
 }
 
 void Ship::TakeDamage(float damage)

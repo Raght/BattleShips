@@ -14,7 +14,7 @@ Weapon::Weapon(const Prefab& _weapon_prefab, const Missile& _missile,
 }
 
 
-bool Weapon::TryShoot(std::vector<Missile>& missiles)
+bool Weapon::TryShoot(Team team, std::vector<Missile>& missiles)
 {
 	if (ammo <= 0)
 		return false;
@@ -33,7 +33,7 @@ bool Weapon::TryShoot(std::vector<Missile>& missiles)
 		firing_origin_indexes.insert(firing_origin_index);
 
 		GameObject& firing_origin = childrenGameObjects[firing_origin_index];
-		Missile fired_missile = Missile(missile, firing_origin.position, firing_origin.direction);
+		Missile fired_missile = Missile(missile, firing_origin.position, firing_origin.direction, team);
 		missiles.push_back(fired_missile);
 	}
 

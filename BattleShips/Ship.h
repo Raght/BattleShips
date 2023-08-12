@@ -13,14 +13,19 @@
 class Ship : public PhysicsObject
 {
 public:
+	Ship();
 	Ship(const Hull& hull, const Weapon& weapon,
 		olc::vf2d initial_position, olc::vf2d initial_direction,
-		const std::string& name, Team team, float initial_velocity = 0);
+		const std::string& name, Team team, olc::vf2d initial_velocity = {0.0f, 0.0f});
 
 	void SetAcceleration(olc::vf2d new_acceleration);
 	void Move(olc::vf2d move);
+	void MoveTo(olc::vf2d new_position);
 	void SetPosition(olc::vf2d new_position);
 	void Rotate(olc::vf2d point, float degrees);
+	void Rotate(float degrees);
+	void AlignDirection(olc::vf2d new_direction);
+
 	void UpdatePosition(float fElapsedTime);
 
 	void TurnLeft(float degrees);
