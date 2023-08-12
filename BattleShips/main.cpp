@@ -167,7 +167,7 @@ public:
 		for (int i = 0; i < available_hulls.size(); i++)
 		{
 			Hull& hull_prototype = available_hulls[i];
-			Weapon& weapon_prototype = assault_cannon;
+			Weapon& weapon_prototype = laser_cannon;
 			std::string name;
 			Team team;
 			if (i == 0)
