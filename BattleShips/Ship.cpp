@@ -14,9 +14,11 @@ Ship::Ship(const Hull& _hull, const Weapon& _weapon,
 	acceleration = 0 * direction;
 
 	hull = _hull;
+	hull.mesh.ChangeColor(_team.color);
 	hull.MoveTo(initial_position);
 	hull.AlignDirection(initial_direction);
 	weapon = _weapon;
+	weapon.mesh.ChangeColor(_team.color);
 	weapon.MoveTo(hull.childrenGameObjects[0].position);
 	weapon.AlignDirection(hull.childrenGameObjects[0].direction);
 

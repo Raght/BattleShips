@@ -215,9 +215,9 @@ public:
 
 				ship_to_spawn = Ship(hull_prototype, weapon_prototype, initial_position, initial_direction, name, team, initial_velocity);
 			} while (ShipCollidesAnyOtherShip(ship_to_spawn));
-			//} while (false);
+			
 			ships.push_back(ship_to_spawn);
-			ships[i].sizeBoundingBox = { UI_character_size, UI_character_size };
+			ships[i].sizeBoundingBox = 1.5 * olc::vf2d{ UI_character_size, UI_character_size };
 		}
 		players.push_back(Player(control_scheme_player_first, &ships[0]));
 		players.push_back(Player(control_scheme_player_second, &ships[1]));
@@ -246,6 +246,12 @@ public:
 			
 			if (!ShipCollidesAnyOtherShip(i))
 				ship.UpdatePosition(fElapsedTime);
+			else
+			{
+				ship.acceleration = ship.acceleration * (-1.0f);
+				ship.velocity = ship.velocity * (-1.0f);
+			}
+				
 			olc::vf2d position_mod = { Mod(ship.position.x, SCREEN_WIDTH), Mod(ship.position.y, SCREEN_HEIGHT) };
 			ship.SetPosition(position_mod);
 

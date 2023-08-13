@@ -39,6 +39,8 @@ public:
 	void Rotate(float degrees);
 	Mesh ReturnRotatedMesh(float degrees);
 
+	void ChangeColor(olc::Pixel color);
+
 	olc::vf2d center;
 	olc::vf2d direction;
 	std::vector<Shape> polygons;

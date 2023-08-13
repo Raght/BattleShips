@@ -129,3 +129,11 @@ Mesh Mesh::ReturnRotatedMesh(float degrees)
 	rotated_mesh.Rotate(center, degrees);
 	return rotated_mesh;
 }
+
+void Mesh::ChangeColor(olc::Pixel color)
+{
+	for (Shape& polygon : polygons)
+	{
+		polygon.color = color;
+	}
+}
