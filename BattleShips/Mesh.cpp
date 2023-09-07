@@ -7,8 +7,8 @@ Shape::Shape()
 
 }
 
-Shape::Shape(const std::vector<olc::vf2d>& _points, olc::Pixel _color)
-	: points(_points), color(_color)
+Shape::Shape(const std::vector<olc::vf2d>& _points, olc::Pixel _color, bool _is_convex, DrawingMode _drawing_mode)
+	: points(_points), color(_color), isConvex(_is_convex), drawingMode(_drawing_mode)
 {
 
 }
@@ -20,10 +20,18 @@ Mesh::Mesh()
 	//*this = MISSING_MESH;
 }
 
-Mesh::Mesh(olc::vf2d _center, olc::vf2d _direction, const std::vector<Shape>& _polygons)
+Mesh::Mesh(olc::vf2d _center, olc::vf2d _direction, const std::vector<Shape>& _polygons,
+	bool _all_polygons_set_convex, DrawingMode _all_polygons_force_drawing_mode)
 	: center(_center), direction(_direction)
 {
+	m_AllPolygonsAreConvex = _all_polygons_set_convex;
+	m_AllPolygonsForcedDrawingMode = _all_polygons_force_drawing_mode;
 	polygons = _polygons;
+	//for (Shape& polygon : polygons)
+	//{
+	//	polygon.isConvex = _all_polygons_set_convex;
+	//	polygon.drawingMode = _all_polygons_force_drawing_mode;
+	//}
 }
 
 void Mesh::ScalePoint(olc::vf2d& point, float scale_factor, olc::vf2d center)
@@ -130,10 +138,20 @@ Mesh Mesh::ReturnRotatedMesh(float degrees)
 	return rotated_mesh;
 }
 
-void Mesh::ChangeColor(olc::Pixel color)
+void Mesh::ChangeColor(olc::Pixel color, BlendMode blend_mode)
 {
 	for (Shape& polygon : polygons)
 	{
-		polygon.color = color;
+		polygon.color = BlendColorsNoAlpha(polygon.color, color, blend_mode);
 	}
+}
+
+bool Mesh::AllPolygonsAreConvex()
+{
+	return m_AllPolygonsAreConvex;
+}
+
+DrawingMode Mesh::AllPolygonsForcedDrawingMode()
+{
+	return m_AllPolygonsForcedDrawingMode;
 }

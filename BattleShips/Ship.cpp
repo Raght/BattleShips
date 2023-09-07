@@ -14,13 +14,13 @@ Ship::Ship(const Hull& _hull, const Weapon& _weapon,
 	acceleration = 0 * direction;
 
 	hull = _hull;
-	hull.mesh.ChangeColor(_team.color);
 	hull.MoveTo(initial_position);
 	hull.AlignDirection(initial_direction);
+	hull.mesh.ChangeColor(_team.color, BlendMode::MULTIPLY);
 	weapon = _weapon;
-	weapon.mesh.ChangeColor(_team.color);
 	weapon.MoveTo(hull.childrenGameObjects[0].position);
 	weapon.AlignDirection(hull.childrenGameObjects[0].direction);
+	weapon.mesh.ChangeColor(_team.color, BlendMode::MULTIPLY);
 
 	name = _name;
 	team = _team;
@@ -118,6 +118,12 @@ void Ship::Brake()
 		StopAccelerating();
 	else
 		SetAcceleration(new_acceleration);
+}
+
+void Ship::ChangeColor(olc::Pixel new_color, BlendMode blend_mode)
+{
+	hull.mesh.ChangeColor(new_color, blend_mode);
+	weapon.mesh.ChangeColor(new_color, blend_mode);
 }
 
 void Ship::TryShoot(std::vector<Missile>& missiles)

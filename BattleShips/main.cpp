@@ -152,6 +152,67 @@ public:
 		}
 	}
 
+
+	void DrawShapeOutline(const Shape& polygon)
+	{
+		if (polygon.points.size() == 0)
+		{
+			return;
+		}
+		else if (polygon.points.size() == 1)
+		{
+			FillCircle(ToScreenSpace(polygon.points[0]), 1, polygon.color);
+			return;
+		}
+
+		for (int i = 0; i < polygon.points.size() - 1; i++)
+		{
+			olc::vf2d position1 = polygon.points[i];
+			olc::vf2d position2 = polygon.points[i + 1];
+			DrawLine(ToScreenSpace(position1), ToScreenSpace(position2), polygon.color);
+		}
+		olc::vf2d position1 = polygon.points[polygon.points.size() - 1];
+		olc::vf2d position2 = polygon.points[0];
+		DrawLine(ToScreenSpace(position1), ToScreenSpace(position2), polygon.color);
+	}
+
+	void DrawConvexShapeFill(const Shape& polygon)
+	{
+		for (int i = 1; i < polygon.points.size() - 1; i++)
+		{
+			FillTriangle(ToScreenSpace(polygon.points[0]), ToScreenSpace(polygon.points[i]), ToScreenSpace(polygon.points[i + 1]), polygon.color);
+		}
+	}
+
+	// For now uses DrawShapeOutline(const Shape&)
+	void DrawNonConvexShapeFill(const Shape& polygon)
+	{
+		DrawShapeOutline(polygon);
+	}
+
+	void DrawShape(const Shape& polygon)
+	{
+		if (polygon.drawingMode == DrawingMode::OUTLINE)
+		{
+			DrawShapeOutline(polygon);
+		}
+		else if (polygon.drawingMode == DrawingMode::FILL)
+		{
+			if (polygon.isConvex)
+				DrawConvexShapeFill(polygon);
+			else
+				DrawNonConvexShapeFill(polygon);
+		}
+	}
+
+	void DrawMesh(const Mesh& mesh)
+	{
+		for (const Shape& polygon : mesh.polygons)
+		{
+			DrawShape(polygon);
+		}
+	}
+
 	void DrawGameObject(GameObject& game_object)
 	{
 		for (int i = 0; i <= game_object.childrenGameObjects.size(); i++)
@@ -162,28 +223,7 @@ public:
 
 			GameObject& game_object_to_draw = *p_game_object_to_draw;
 
-			for (const Shape& polygon : game_object_to_draw.mesh.polygons)
-			{
-				if (polygon.points.size() == 0)
-				{
-					return;
-				}
-				else if (polygon.points.size() == 1)
-				{
-					FillCircle(ToScreenSpace(polygon.points[0]), 1, polygon.color);
-					return;
-				}
-
-				for (int i = 0; i < polygon.points.size() - 1; i++)
-				{
-					olc::vf2d position1 = polygon.points[i];
-					olc::vf2d position2 = polygon.points[i + 1];
-					DrawLine(ToScreenSpace(position1), ToScreenSpace(position2), polygon.color);
-				}
-				olc::vf2d position1 = polygon.points[polygon.points.size() - 1];
-				olc::vf2d position2 = polygon.points[0];
-				DrawLine(ToScreenSpace(position1), ToScreenSpace(position2), polygon.color);
-			}
+			DrawMesh(game_object_to_draw.mesh);
 		}
 	}
 
@@ -217,7 +257,7 @@ public:
 			} while (ShipCollidesAnyOtherShip(ship_to_spawn));
 			
 			ships.push_back(ship_to_spawn);
-			ships[i].sizeBoundingBox = 1.5 * olc::vf2d{ UI_character_size, UI_character_size };
+			ships[i].sizeBoundingBox = 1.5 * olc::vi2d{ UI_character_size, UI_character_size };
 		}
 		players.push_back(Player(control_scheme_player_first, &ships[0]));
 		players.push_back(Player(control_scheme_player_second, &ships[1]));
@@ -248,6 +288,7 @@ public:
 				ship.UpdatePosition(fElapsedTime);
 			else
 			{
+				ship.TakeDamage(5 * fElapsedTime);
 				ship.acceleration = ship.acceleration * (-1.0f);
 				ship.velocity = ship.velocity * (-1.0f);
 			}

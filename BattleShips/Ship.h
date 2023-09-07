@@ -34,6 +34,8 @@ public:
 	void StopAccelerating();
 	void Brake();
 
+	void ChangeColor(olc::Pixel new_color, BlendMode blend_mode = BlendMode::REPAINT);
+
 	void TryShoot(std::vector<Missile>& missiles);
 
 	void TakeDamage(float damage);
