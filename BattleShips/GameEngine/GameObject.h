@@ -2,25 +2,26 @@
 #include "olcPixelGameEngine.h"
 #include "Math.h"
 #include "Mesh.h"
+#include "Rigidbody.h"
 #include <cassert>
 
 
-
-
-
+const float INFINITE_LIFETIME = -1.0f;
 
 
 class GameObject
 {
 public:
-	GameObject();
+	GameObject() = default;
 	GameObject(const GameObject& game_object, olc::vf2d position, olc::vf2d direction);
 	GameObject(olc::vf2d position);
 	GameObject(olc::vf2d position, olc::vf2d direction);
 	GameObject(olc::vf2d position, olc::vf2d direction, const Mesh& mesh);
-	GameObject(olc::vf2d position, olc::vf2d direction, const Mesh& mesh, const std::vector<GameObject>& children_gameobjects);
+	GameObject(olc::vf2d position, olc::vf2d direction, const Mesh& mesh, const std::vector<GameObject*>& children_gameobjects);
 
 	static GameObject Instantiate(GameObject prefab, olc::vf2d position, olc::vf2d direction);
+
+	void AttachTo(GameObject* game_object);
 
 	void Move(olc::vf2d move);
 	void MoveTo(olc::vf2d position);
@@ -41,11 +42,13 @@ public:
 	olc::vf2d direction = { 1, 0 };
 
 	float lifetime = 0.0f;
-	float lifetimeSeconds = -1.0f;
+	float lifetimeSeconds = INFINITE_LIFETIME;
 
+	Rigidbody* rigidbody;
 	Mesh mesh;
+	BaseScriptComponent* script;
 
-	std::vector<GameObject> childrenGameObjects;
+	std::vector<GameObject*> childrenGameObjects;
 	//std::vector<int> childrenGameObjects;
 
 private:

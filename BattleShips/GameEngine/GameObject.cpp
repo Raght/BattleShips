@@ -2,11 +2,6 @@
 
 
 
-GameObject::GameObject()
-{
-
-}
-
 GameObject::GameObject(const GameObject& game_object, olc::vf2d position, olc::vf2d direction)
 {
 	*this = GameObject::Instantiate(game_object, position, direction);
@@ -32,7 +27,7 @@ GameObject::GameObject(olc::vf2d _position, olc::vf2d _direction, const Mesh& _m
 	mesh.Rotate(Degrees(AngleBetweenToRotateAntiClockwise(mesh.direction, direction)));
 }
 
-GameObject::GameObject(olc::vf2d _position, olc::vf2d _direction, const Mesh& _mesh, const std::vector<GameObject>& _children_gameobjects)
+GameObject::GameObject(olc::vf2d _position, olc::vf2d _direction, const Mesh& _mesh, const std::vector<GameObject*>& _children_gameobjects)
 {
 	childrenGameObjects = _children_gameobjects;
 	//for (GameObject& pGameObject : childrenGameObjects)
@@ -56,13 +51,18 @@ GameObject GameObject::Instantiate(GameObject prefab, olc::vf2d _position, olc::
 	return prefab;
 }
 
+void GameObject::AttachTo(GameObject* game_object)
+{
+	game_object->childrenGameObjects.push_back(this);
+}
+
 void GameObject::Move(olc::vf2d move)
 {
 	position += move;
 	mesh.Move(move);
-	for (GameObject& pGameObject : childrenGameObjects)
+	for (GameObject* pGameObject : childrenGameObjects)
 	{
-		pGameObject.Move(move);
+		pGameObject->Move(move);
 	}
 }
 
@@ -77,9 +77,9 @@ void GameObject::Scale(olc::vf2d scale_origin, float new_scale)
 
 	Move((new_scale - 1) * Scale() * (position - scale_origin));
 	mesh.Scale(new_scale / Scale(), scale_origin);
-	for (GameObject& pGameObject : childrenGameObjects)
+	for (GameObject* pGameObject : childrenGameObjects)
 	{
-		pGameObject.Scale(position, new_scale);
+		pGameObject->Scale(position, new_scale);
 	}
 	scale = new_scale;
 }
@@ -108,9 +108,9 @@ void GameObject::Rotate(olc::vf2d rotation_origin, float degrees)
 	position = RotatePointAroundOrigin(position, rotation_origin, Radians(degrees));
 	mesh.Rotate(rotation_origin, degrees);
 	direction = RotateVector(direction, Radians(degrees));
-	for (GameObject& pGameObject : childrenGameObjects)
+	for (GameObject* pGameObject : childrenGameObjects)
 	{
-		pGameObject.Rotate(rotation_origin, degrees);
+		pGameObject->Rotate(rotation_origin, degrees);
 	}
 }
 
@@ -132,5 +132,5 @@ float GameObject::Scale()
 
 bool GameObject::LifetimeExceeded() const
 {
-	return (lifetimeSeconds != -1.0f) && lifetime > lifetimeSeconds;
+	return (lifetimeSeconds != INFINITE_LIFETIME) && lifetime > lifetimeSeconds;
 }

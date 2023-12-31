@@ -2,8 +2,7 @@
 #include <random>
 
 
-inline std::random_device device;
-inline std::default_random_engine rng(device());
+
 
 
 inline const olc::vf2d DIRECTION_RIGHT = { 1.0, 0.0 };

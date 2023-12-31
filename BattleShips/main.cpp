@@ -2,8 +2,7 @@
 #include <vector>
 #include <unordered_set>
 #include <random>
-#include "olcPixelGameEngine.h"
-#include "Collision.h"
+#include "GameEngine/GameEngine.h"
 #include "Ship.h"
 #include "Missile.h"
 #include "Player.h"
@@ -21,7 +20,7 @@ std::uniform_real_distribution<float> distribution_angles(0, 2 * PI);
 std::uniform_real_distribution<float> distribution_velocities(0, 40);
 
 
-class Game : public olc::PixelGameEngine
+class Game : public GameEngine
 {
 public:
 	Game()
@@ -111,17 +110,6 @@ public:
 		return ship_collides_another_ship;
 	}
 
-	void RemoveMissiles(std::unordered_set<int>& missiles_to_remove)
-	{
-		int missiles_removed = 0;
-		for (int missile_index : missiles_to_remove)
-		{
-			missiles.erase(missiles.begin() + missile_index - missiles_removed);
-			missiles_removed++;
-		}
-		missiles_to_remove.clear();
-	}
-
 	void ControlShip(Player& player, float fElapsedTime)
 	{
 		Ship& ship = *player.controlled_ship;
@@ -152,91 +140,15 @@ public:
 		}
 	}
 
-
-	void DrawShapeOutline(const Shape& polygon)
-	{
-		if (polygon.points.size() == 0)
-		{
-			return;
-		}
-		else if (polygon.points.size() == 1)
-		{
-			FillCircle(ToScreenSpace(polygon.points[0]), 1, polygon.color);
-			return;
-		}
-
-		for (int i = 0; i < polygon.points.size() - 1; i++)
-		{
-			olc::vf2d position1 = polygon.points[i];
-			olc::vf2d position2 = polygon.points[i + 1];
-			DrawLine(ToScreenSpace(position1), ToScreenSpace(position2), polygon.color);
-		}
-		olc::vf2d position1 = polygon.points[polygon.points.size() - 1];
-		olc::vf2d position2 = polygon.points[0];
-		DrawLine(ToScreenSpace(position1), ToScreenSpace(position2), polygon.color);
-	}
-
-	void DrawConvexShapeFill(const Shape& polygon)
-	{
-		for (int i = 1; i < polygon.points.size() - 1; i++)
-		{
-			FillTriangle(ToScreenSpace(polygon.points[0]), ToScreenSpace(polygon.points[i]), ToScreenSpace(polygon.points[i + 1]), polygon.color);
-		}
-	}
-
-	// For now uses DrawShapeOutline(const Shape&)
-	void DrawNonConvexShapeFill(const Shape& polygon)
-	{
-		DrawShapeOutline(polygon);
-	}
-
-	void DrawShape(const Shape& polygon)
-	{
-		if (polygon.drawingMode == DrawingMode::OUTLINE)
-		{
-			DrawShapeOutline(polygon);
-		}
-		else if (polygon.drawingMode == DrawingMode::FILL)
-		{
-			if (polygon.isConvex)
-				DrawConvexShapeFill(polygon);
-			else
-				DrawNonConvexShapeFill(polygon);
-		}
-	}
-
-	void DrawMesh(const Mesh& mesh)
-	{
-		for (const Shape& polygon : mesh.polygons)
-		{
-			DrawShape(polygon);
-		}
-	}
-
-	void DrawGameObject(GameObject& game_object)
-	{
-		for (int i = 0; i <= game_object.childrenGameObjects.size(); i++)
-		{
-			GameObject* p_game_object_to_draw = &game_object;
-			if (i != game_object.childrenGameObjects.size())
-				p_game_object_to_draw = &game_object.childrenGameObjects[i];
-
-			GameObject& game_object_to_draw = *p_game_object_to_draw;
-
-			DrawMesh(game_object_to_draw.mesh);
-		}
-	}
-
-	
-	bool OnUserCreate() override
+	bool OnGameLoopCreate() override
 	{
 		std::uniform_int_distribution<int> available_hulls_distribution(0, available_hulls.size() - 1);
 		std::uniform_int_distribution<int> available_weapons_distribution(0, available_weapons.size() - 1);
 
 		for (int i = 0; i < available_hulls.size(); i++)
 		{
-			Hull& hull_prototype = available_hulls[available_hulls_distribution(rng)];
-			Weapon& weapon_prototype = available_weapons[available_weapons_distribution(rng)];
+			Hull& hull_prototype = available_hulls[available_hulls_distribution(global_rng)];
+			Weapon& weapon_prototype = available_weapons[available_weapons_distribution(global_rng)];
 			//weapon_prototype = assault_cannon;
 			//weapon_prototype = smg_cannon;
 			//weapon_prototype = laser_cannon;
@@ -246,11 +158,11 @@ public:
 			Ship ship_to_spawn; 
 			do
 			{
-				olc::vf2d initial_position = { distribution_field_width(rng), distribution_field_height(rng) };
-				float angle = distribution_angles(rng);
+				olc::vf2d initial_position = { distribution_field_width(global_rng), distribution_field_height(global_rng) };
+				float angle = distribution_angles(global_rng);
 				//float angle = 0;
 				olc::vf2d initial_direction = { cosf(angle), sinf(angle) };
-				float initial_velocity_magnitude = distribution_velocities(rng);
+				float initial_velocity_magnitude = distribution_velocities(global_rng);
 				olc::vf2d initial_velocity = initial_direction * initial_velocity_magnitude;
 
 				ship_to_spawn = Ship(hull_prototype, weapon_prototype, initial_position, initial_direction, name, team, initial_velocity);
@@ -268,7 +180,7 @@ public:
 
 	
 
-	bool OnUserUpdate(float fElapsedTime) override
+	bool OnGameLoopUpdate(float fElapsedTime) override
 	{
 		Clear(olc::BLACK);
 
@@ -297,21 +209,6 @@ public:
 			ship.SetPosition(position_mod);
 
 			//DrawCircle(ToScreenSpace(ship.weapon.mesh.missile_origins[0].position), 10);
-		}
-
-		std::unordered_set<int> missiles_to_remove;
-		for (int i = 0; i < missiles.size(); i++)
-		{
-			Missile& missile = missiles[i];
-			missile.lifetime += fElapsedTime;
-			if (missile.LifetimeExceeded())
-				missiles_to_remove.insert(i);
-		}
-		RemoveMissiles(missiles_to_remove);
-
-		for (Missile& missile : missiles)
-		{
-			missile.UpdatePosition(fElapsedTime);
 		}
 
 		for (int i = 0; i < missiles.size(); i++)

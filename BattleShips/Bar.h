@@ -9,6 +9,6 @@ public:
 	olc::vi2d position;
 	olc::vi2d size;
 	float value;
-	float  maxValue;
-	float  minValue = 0;
+	float maxValue;
+	float minValue = 0;
 };
